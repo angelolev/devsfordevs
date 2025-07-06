@@ -3,7 +3,7 @@ import LandingPage from "./pages/LandingPage";
 import Feed from "./pages/Feed";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "./contexts/AuthContext";
-import { Navbar } from "./components";
+import { AuthModal, Navbar } from "./components";
 import { useState } from "react";
 import { AuthModalType } from "./types";
 
@@ -12,7 +12,7 @@ const AppContent: React.FC = () => {
   // const { user, needsUsername, setUserUsername } = useAuth();
   // const [searchParams] = useSearchParams();
 
-  // // Check for auth errors from OAuth callback
+  // Check for auth errors from OAuth callback
   // useEffect(() => {
   //   const authError = searchParams.get("auth_error");
   //   if (authError) {
@@ -25,9 +25,9 @@ const AppContent: React.FC = () => {
     setAuthModal(type);
   };
 
-  // const closeAuthModal = () => {
-  //   setAuthModal(null);
-  // };
+  const closeAuthModal = () => {
+    setAuthModal(null);
+  };
 
   // const handleUsernameComplete = (username: string) => {
   //   setUserUsername(username);
@@ -52,7 +52,7 @@ const AppContent: React.FC = () => {
       </main>
 
       {/* Auth Modal */}
-      {/* {authModal && <AuthModal type={authModal} onClose={closeAuthModal} />} */}
+      {authModal && <AuthModal type={authModal} onClose={closeAuthModal} />}
 
       {/* Username Selection Modal */}
       {/* {user && needsUsername && (

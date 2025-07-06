@@ -1,3 +1,4 @@
+export { default as AuthModal } from "./AuthModal";
 export { default as CommentsSection } from "./CommentsSection";
 export { default as CreatePost } from "./CreatePost";
 export { default as Navbar } from "./Navbar";

@@ -6,7 +6,6 @@ import {
   MessageCircle,
   Heart,
   Calendar,
-  Check,
   CheckCheck,
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";

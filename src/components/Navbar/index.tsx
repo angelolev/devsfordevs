@@ -21,7 +21,7 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
   const { theme, toggleTheme } = useTheme();
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
 
   const navigate = useNavigate();
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -58,7 +58,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
   };
 
   const handleLogout = () => {
-    logout();
+    signOut();
     setShowUserMenu(false);
     navigate("/"); // Redirect to home after logout
   };
@@ -122,13 +122,13 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
                         {user.avatar ? (
                           <img
                             src={user.avatar}
-                            alt={user.name || user.username}
+                            alt={user.name || user.username || user.email}
                             className="w-8 h-8 rounded-full object-cover border-2 border-gray-900/20"
                           />
                         ) : (
                           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                             <span className="text-white font-semibold text-xs">
-                              {(user.name || user.username)
+                              {(user.name || user.username || user.email)
                                 .charAt(0)
                                 .toUpperCase()}
                             </span>
@@ -138,7 +138,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
 
                       {/* Username - Hidden on mobile */}
                       <span className="hidden sm:inline text-sm font-medium text-gray-900 max-w-20">
-                        @{user.username}
+                        @{user.username || user.email}
                       </span>
 
                       {/* Chevron Icon - Hidden on mobile */}
@@ -160,16 +160,22 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
                             <div className="py-4">
                               {/* User Info Header */}
                               <div className="flex items-center space-x-3 pb-4 border-b border-gray-200 dark:border-gray-600">
-                                {user.avatar ? (
+                                {user.avatar_url ? (
                                   <img
-                                    src={user.avatar}
-                                    alt={user.name || user.username}
+                                    src={user.avatar_url}
+                                    alt={
+                                      user.name || user.username || user.email
+                                    }
                                     className="w-12 h-12 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
                                   />
                                 ) : (
                                   <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                                     <span className="text-white font-semibold text-lg">
-                                      {(user.name || user.username)
+                                      {(
+                                        user.name ||
+                                        user.username ||
+                                        user.email
+                                      )
                                         .charAt(0)
                                         .toUpperCase()}
                                     </span>
@@ -177,10 +183,10 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
                                 )}
                                 <div className="flex-1 min-w-0">
                                   <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                                    {user.name || user.username}
+                                    {user.name || user.username || user.email}
                                   </p>
                                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    @{user.username}
+                                    @{user.username || user.email}
                                   </p>
                                 </div>
                               </div>
@@ -234,16 +240,16 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
                           {/* User Info Header */}
                           <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-600">
                             <div className="flex items-center space-x-3">
-                              {user.avatar ? (
+                              {user.avatar_url ? (
                                 <img
-                                  src={user.avatar}
-                                  alt={user.name || user.username}
+                                  src={user.avatar_url}
+                                  alt={user.name || user.username || user.email}
                                   className="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
                                 />
                               ) : (
                                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                                   <span className="text-white font-semibold">
-                                    {(user.name || user.username)
+                                    {(user.name || user.username || user.email)
                                       .charAt(0)
                                       .toUpperCase()}
                                   </span>
@@ -251,10 +257,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
                               )}
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                                  {user.name || user.username}
-                                </p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">
-                                  @{user.username}
+                                  {user.name || user.username || user.email}
                                 </p>
                               </div>
                             </div>
