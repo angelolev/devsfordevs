@@ -55,7 +55,7 @@ const TopicSidebar: React.FC<TopicSidebarProps> = ({
             {selectedTopics.length > 0 && (
               <button
                 onClick={onClearAll}
-                className="flex items-center space-x-1 px-2 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+                className="flex items-center space-x-1 px-2 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 cursor-pointer"
               >
                 <X className="h-3 w-3" />
                 <span>Clear</span>
@@ -64,7 +64,7 @@ const TopicSidebar: React.FC<TopicSidebarProps> = ({
             {isMobile && onClose && (
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"
               >
                 <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
               </button>
@@ -93,7 +93,7 @@ const TopicSidebar: React.FC<TopicSidebarProps> = ({
                     <span>{topic.name}</span>
                     <button
                       onClick={() => onTopicToggle(topicId)}
-                      className="hover:bg-black/10 dark:hover:bg-white/10 rounded-full p-0.5 transition-colors duration-200"
+                      className="hover:bg-black/10 dark:hover:bg-white/10 rounded-full p-0.5 transition-colors duration-200 cursor-pointer"
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -120,11 +120,10 @@ const TopicSidebar: React.FC<TopicSidebarProps> = ({
                 <button
                   key={topic.id}
                   onClick={() => handleTopicToggle(topic.id)}
-                  className={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-full border transition-all duration-200 ${
-                    isSelected
+                  className={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-full border transition-all duration-200 ${isSelected
                       ? `${topic.bgColor} ${topic.color} shadow-sm transform scale-105`
                       : "bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 hover:border-gray-300 dark:hover:border-gray-500 hover:transform hover:scale-105 cursor-pointer"
-                  }`}
+                    }`}
                   style={isSelected ? { borderColor: "currentColor" } : {}}
                 >
                   {topic.name}
@@ -148,7 +147,7 @@ const TopicSidebar: React.FC<TopicSidebarProps> = ({
         {/* Mobile-specific close button */}
         {isMobile && onClose && (
           <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
-            <button onClick={onClose} className="w-full btn-primary">
+            <button onClick={onClose} className="w-full btn-primary cursor-pointer">
               Apply Filters
             </button>
           </div>

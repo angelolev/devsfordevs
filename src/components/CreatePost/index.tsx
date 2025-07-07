@@ -140,7 +140,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
                   selectedFile
                     ? "bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/30"
                     : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-                }`}
+                } cursor-pointer`}
                 title={selectedFile ? "Change image" : "Add image"}
               >
                 <Image className="h-5 w-5" />
@@ -184,7 +184,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
                   type="button"
                   onClick={handleRemoveImage}
                   disabled={isUploading}
-                  className="absolute top-2 right-2 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors duration-200 disabled:opacity-50"
+                  className="absolute top-2 right-2 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors duration-200 disabled:opacity-50 cursor-pointer"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -199,7 +199,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
                   Select Topics ({selectedTopics.length})
                 </span>
               </div>
-              <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+              <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto pt-2">
                 {AVAILABLE_TOPICS.map((topic) => {
                   const isSelected = selectedTopics.includes(topic.id);
                   return (
@@ -212,12 +212,8 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
                         isSelected
                           ? `${topic.bgColor} ${topic.color} shadow-sm transform scale-105`
                           : "bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600"
-                      } disabled:opacity-50`}
-                      style={
-                        isSelected
-                          ? { borderColor: "currentColor", borderOpacity: 0.5 }
-                          : {}
-                      }
+                      } disabled:opacity-50 cursor-pointer`}
+                      style={isSelected ? { borderColor: "currentColor" } : {}}
                     >
                       {topic.name}
                     </button>
@@ -228,7 +224,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
 
             {/* Selected Topics Display */}
             {selectedTopics.length > 0 && (
-              <div className="flex flex-wrap gap-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+              <div className="flex flex-wrap items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
                 <span className="text-xs font-semibold text-gray-600 dark:text-gray-400 mr-2">
                   Selected:
                 </span>
@@ -241,7 +237,6 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
                       className={`inline-flex items-center space-x-1 px-2 py-1 text-xs font-medium rounded-full border ${topic.bgColor} ${topic.color}`}
                       style={{
                         borderColor: "currentColor",
-                        borderOpacity: 0.5,
                       }}
                     >
                       <span>{topic.name}</span>
@@ -249,7 +244,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
                         type="button"
                         onClick={() => handleTopicToggle(topicId)}
                         disabled={isUploading}
-                        className="hover:bg-black/10 dark:hover:bg-white/10 rounded-full p-0.5 transition-colors duration-200"
+                        className="hover:bg-black/10 dark:hover:bg-white/10 rounded-full p-0.5 transition-colors duration-200 cursor-pointer"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -270,7 +265,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
                   type="button"
                   onClick={handleCancel}
                   disabled={isUploading}
-                  className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200"
+                  className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200 cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -281,7 +276,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
                     isUploading || !content.trim()
                       ? "opacity-60 cursor-not-allowed"
                       : ""
-                  }`}
+                  } cursor-pointer`}
                 >
                   {isUploading ? (
                     <>

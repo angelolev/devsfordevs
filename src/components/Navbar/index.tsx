@@ -28,7 +28,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
   const [unreadNotifications, setUnreadNotifications] = useState(2); // Mock count
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Mock admin check - in production, this would be from the database
+  const displayName = user?.full_name || user?.username || user?.email;
   const isAdmin = user?.username === "admin" || user?.email?.includes("admin");
 
   // Close menu when clicking outside
@@ -82,7 +82,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
             >
               <Code className="h-6 w-6 sm:h-8 sm:w-8 text-gray-900" />
               <span className="text-lg sm:text-xl font-bold text-gray-900">
-                DevConnect
+                Devs4Devs
               </span>
             </button>
 
@@ -119,25 +119,23 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
                     >
                       {/* User Avatar */}
                       <div className="w-8 h-8 flex-shrink-0">
-                        {user.avatar ? (
+                        {user.avatar_url ? (
                           <img
-                            src={user.avatar}
-                            alt={user.name || user.username || user.email}
+                            src={user.avatar_url}
+                            alt={displayName || ""}
                             className="w-8 h-8 rounded-full object-cover border-2 border-gray-900/20"
                           />
                         ) : (
                           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                             <span className="text-white font-semibold text-xs">
-                              {(user.name || user.username || user.email)
-                                .charAt(0)
-                                .toUpperCase()}
+                              {(displayName || "").charAt(0).toUpperCase()}
                             </span>
                           </div>
                         )}
                       </div>
 
                       {/* Username - Hidden on mobile */}
-                      <span className="hidden sm:inline text-sm font-medium text-gray-900 max-w-20">
+                      <span className="hidden sm:inline text-sm font-medium text-gray-900">
                         @{user.username || user.email}
                       </span>
 
@@ -163,19 +161,13 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
                                 {user.avatar_url ? (
                                   <img
                                     src={user.avatar_url}
-                                    alt={
-                                      user.name || user.username || user.email
-                                    }
+                                    alt={displayName || ""}
                                     className="w-12 h-12 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
                                   />
                                 ) : (
                                   <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                                     <span className="text-white font-semibold text-lg">
-                                      {(
-                                        user.name ||
-                                        user.username ||
-                                        user.email
-                                      )
+                                      {(displayName || "")
                                         .charAt(0)
                                         .toUpperCase()}
                                     </span>
@@ -183,7 +175,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
                                 )}
                                 <div className="flex-1 min-w-0">
                                   <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                                    {user.name || user.username || user.email}
+                                    {displayName}
                                   </p>
                                   <p className="text-sm text-gray-500 dark:text-gray-400">
                                     @{user.username || user.email}
@@ -243,21 +235,24 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
                               {user.avatar_url ? (
                                 <img
                                   src={user.avatar_url}
-                                  alt={user.name || user.username || user.email}
+                                  alt={displayName || ""}
                                   className="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
                                 />
                               ) : (
                                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                                   <span className="text-white font-semibold">
-                                    {(user.name || user.username || user.email)
+                                    {(displayName || "")
                                       .charAt(0)
                                       .toUpperCase()}
                                   </span>
                                 </div>
                               )}
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                                  {user.name || user.username || user.email}
+                                <p className="font-semibold text-sm text-gray-800 dark:text-white">
+                                  {displayName}
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                  @{user.username || user.email}
                                 </p>
                               </div>
                             </div>
@@ -305,10 +300,10 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
               ) : (
                 <button
                   onClick={() => onAuthModal("login")}
-                  className="flex items-center space-x-1 px-2 py-1 sm:px-4 sm:py-2 bg-gray-900 hover:bg-gray-800 text-white text-xs sm:text-sm font-medium rounded-lg transition-colors duration-200"
+                  className="flex items-center space-x-2 px-3 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200"
                 >
-                  <LogIn className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span className="hidden md:inline">Sign In</span>
+                  <LogIn className="h-5 w-5" />
+                  <span className="text-sm font-medium">Login</span>
                 </button>
               )}
             </div>

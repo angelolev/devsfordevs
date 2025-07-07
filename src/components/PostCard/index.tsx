@@ -78,7 +78,7 @@ const Post: React.FC<PostProps> = ({
           {/* Avatar */}
           <button
             onClick={handleUserClick}
-            className="flex-shrink-0 hover:opacity-80 transition-opacity duration-200"
+            className="flex-shrink-0 hover:opacity-80 transition-opacity duration-200 cursor-pointer"
           >
             {post.author.avatar ? (
               <img
@@ -101,7 +101,7 @@ const Post: React.FC<PostProps> = ({
             <div className="flex items-center justify-between mb-2">
               <button
                 onClick={handleUserClick}
-                className="text-[#7aa2f7] text-sm hover:underline"
+                className="text-[#7aa2f7] text-sm hover:underline cursor-pointer"
               >
                 <span className="text-[#e0af68]">~/{post.author.username}</span>
               </button>
@@ -156,11 +156,10 @@ const Post: React.FC<PostProps> = ({
         <button
           onClick={() => handleReaction("happy")}
           disabled={!user}
-          className={`flex items-center space-x-1 text-base transition-colors duration-200 ${
-            hasUserReacted("happy")
+          className={`flex items-center space-x-1 text-base transition-colors duration-200 ${hasUserReacted("happy")
               ? "text-[#9ece6a]"
               : "text-[#565f89] hover:text-[#9ece6a]"
-          } ${!user ? "cursor-not-allowed opacity-50" : ""}`}
+            } ${!user ? "cursor-not-allowed opacity-50" : ""} cursor-pointer`}
         >
           <Smile className="h-4 w-4" />
           <span>
@@ -172,11 +171,10 @@ const Post: React.FC<PostProps> = ({
         <button
           onClick={() => handleReaction("sad")}
           disabled={!user}
-          className={`flex items-center space-x-1 text-base transition-colors duration-200 ${
-            hasUserReacted("sad")
+          className={`flex items-center space-x-1 text-base transition-colors duration-200 ${hasUserReacted("sad")
               ? "text-[#f7768e]"
               : "text-[#565f89] hover:text-[#f7768e]"
-          } ${!user ? "cursor-not-allowed opacity-50" : ""}`}
+            } ${!user ? "cursor-not-allowed opacity-50" : ""} cursor-pointer`}
         >
           <Frown className="h-4 w-4" />
           <span>

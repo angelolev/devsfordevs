@@ -1,12 +1,11 @@
 export interface User {
   id: string;
-  username?: string; // Made optional for initial signup
-  name?: string; // Real name from OAuth provider
+  username?: string;
+  full_name?: string;
   email: string;
-  avatar?: string;
-  provider: "google";
-  joinedAt: Date;
-  username_set?: boolean; // Track if user has set their username
+  avatar_url?: string;
+  provider?: "google" | "github";
+  username_set?: boolean;
 }
 
 export interface Post {

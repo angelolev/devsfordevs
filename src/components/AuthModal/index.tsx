@@ -1,10 +1,11 @@
-import React from "react";
-import { X, Settings } from "lucide-react";
+import React, { useRef, useState, useEffect } from "react";
+import { Github } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 
 interface AuthModalProps {
-  type: "login";
+  isOpen: boolean;
   onClose: () => void;
+  onOpenChange?: (isOpen: boolean) => void;
 }
 
 const GoogleIcon = () => (
@@ -28,76 +29,169 @@ const GoogleIcon = () => (
   </svg>
 );
 
-const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
-  const { signInWithGoogle, isLoading } = useAuth();
+const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
+  const {
+    signInWithGoogle,
+    signInWithGitHub,
+    isLoading,
+    isMissingUsername,
+    updateProfile,
+  } = useAuth();
+  const modalRef = useRef<HTMLDivElement>(null);
+  const [username, setUsername] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
-  const handleGoogleLogin = async () => {
-    await signInWithGoogle();
-    // Don't close modal immediately as OAuth will redirect
-    console.log("OAuth redirect initiated");
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        !isMissingUsername &&
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen, onClose, isMissingUsername]);
+
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Sanitize input to allow only letters and numbers
+    const sanitizedValue = value.replace(/[^a-zA-Z0-9]/g, "");
+    setUsername(sanitizedValue);
   };
 
+  const handleUpdateUsername = async () => {
+    setError(null);
+    const usernameRegex = /^[a-zA-Z0-9]+$/;
+    const letters = username.match(/[a-zA-Z]/g) || [];
+
+    if (username.length < 3) {
+      setError("Username must be at least 3 characters long.");
+      return;
+    }
+    if (username.length > 12) {
+      setError("Username cannot be more than 12 characters long.");
+      return;
+    }
+    if (!usernameRegex.test(username)) {
+      setError("Username can only contain letters and numbers.");
+      return;
+    }
+    if (letters.length < 3) {
+      setError("Username must contain at least 3 letters.");
+      return;
+    }
+
+    try {
+      await updateProfile(username);
+      onClose(); // Close modal on success
+    } catch (err) {
+      const error = err as Error;
+      if (
+        error.message?.includes(
+          "duplicate key value violates unique constraint"
+        )
+      ) {
+        setError("This username is already taken.");
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+    }
+  };
+
+  if (!isOpen && !isMissingUsername) return null;
+
+  if (isMissingUsername) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div
+          ref={modalRef}
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-md"
+        >
+          <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white mb-4">
+            Welcome to DevsForDevs!
+          </h2>
+          <p className="text-center text-gray-600 dark:text-gray-300 mb-6">
+            Choose a unique username to complete your profile.
+          </p>
+          <div className="flex flex-col gap-4">
+            <input
+              type="text"
+              placeholder="Enter your username"
+              value={username}
+              onChange={handleUsernameChange}
+              maxLength={12}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            />
+            {username.length >= 3 &&
+              (username.match(/[a-zA-Z]/g) || []).length < 3 && (
+                <p className="text-yellow-500 text-sm -mt-2">
+                  Username must contain at least 3 letters.
+                </p>
+              )}
+            {error && <p className="text-red-500 text-sm -mt-2">{error}</p>}
+            <button
+              onClick={handleUpdateUsername}
+              disabled={
+                isLoading ||
+                username.length < 3 ||
+                (username.match(/[a-zA-Z]/g) || []).length < 3
+              }
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-blue-400 flex items-center justify-center cursor-pointer"
+            >
+              {isLoading ? "Saving..." : "Save and Continue"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="card w-full max-w-md animate-fade-in">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-600">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-            Welcome to DevConnect
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div
+        ref={modalRef}
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-sm"
+      >
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+            Log in to DevsForDevs
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
+            className="text-gray-500 hover:text-gray-800 dark:hover:text-white cursor-pointer"
           >
-            <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+            &times;
           </button>
         </div>
-
-        <div className="p-6 space-y-4">
-          <div className="text-center mb-6">
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
-              Sign in with your developer account to join the conversation
-            </p>
-          </div>
-
-          <div className="space-y-3">
-            <button
-              onClick={handleGoogleLogin}
-              disabled={isLoading}
-              className="w-full flex items-center justify-center space-x-3 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <div className="h-5 w-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <GoogleIcon />
-              )}
-              <span>Continue with Google</span>
-            </button>
-          </div>
-
-          {/* Development Notice */}
-          {(window.location.hostname === "localhost" ||
-            window.location.hostname === "127.0.0.1") && (
-            <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-              <div className="flex items-start space-x-2">
-                <Settings className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-                <div className="text-xs text-blue-600 dark:text-blue-400">
-                  <p className="font-medium mb-1">Development Mode</p>
-                  <p>Make sure your Supabase OAuth redirect URL includes:</p>
-                  <code className="bg-blue-100 dark:bg-blue-900/30 px-1 rounded block mt-1">
-                    http://localhost:5173/auth/callback
-                  </code>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
-            <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-              By signing in, you agree to our Terms of Service and Privacy
-              Policy. DevConnect is a community for developers to share ideas
-              and connect.
-            </p>
-          </div>
+        <p className="text-center text-gray-600 dark:text-gray-300 mb-6">
+          Connect with developers and share your knowledge.
+        </p>
+        <div className="flex flex-col gap-4">
+          <button
+            onClick={signInWithGoogle}
+            disabled={isLoading}
+            className="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 disabled:bg-red-400 flex items-center justify-center cursor-pointer"
+          >
+            <GoogleIcon />
+            Continue with Google
+          </button>
+          <button
+            onClick={signInWithGitHub}
+            disabled={isLoading}
+            className="w-full bg-gray-900 text-white py-2 px-4 rounded-md hover:bg-black disabled:bg-gray-700 flex items-center justify-center cursor-pointer"
+          >
+            <Github className="w-5 h-5 mr-2" />
+            Continue with GitHub
+          </button>
         </div>
       </div>
     </div>

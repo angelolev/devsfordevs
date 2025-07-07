@@ -103,6 +103,7 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
     if (isOpen) {
       loadNotifications();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   // Close dropdown when clicking outside
@@ -242,7 +243,7 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
             {unreadCount > 0 && (
               <button
                 onClick={markAllAsRead}
-                className="flex items-center space-x-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200"
+                className="flex items-center space-x-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 cursor-pointer"
               >
                 <CheckCheck className="h-4 w-4" />
                 <span>Mark all read</span>
@@ -260,11 +261,10 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
                 <button
                   key={notification.id}
                   onClick={() => handleNotificationClick(notification)}
-                  className={`w-full text-left p-3 rounded-lg transition-colors duration-200 ${
-                    notification.isRead
+                  className={`w-full text-left p-3 rounded-lg transition-colors duration-200 ${notification.isRead
                       ? "bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600"
                       : "bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 border border-blue-200 dark:border-blue-800"
-                  }`}
+                    } cursor-pointer`}
                 >
                   <div className="flex items-start space-x-3">
                     <div className="flex-shrink-0 mt-1">
@@ -325,7 +325,7 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={handleToggleDropdown}
-        className="relative p-2 rounded-lg"
+        className="relative p-2 rounded-lg cursor-pointer"
         aria-label="Notifications"
       >
         <Bell className="h-5 w-5 text-gray-900" />
@@ -347,7 +347,7 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="flex items-center space-x-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200"
+                  className="flex items-center space-x-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 cursor-pointer"
                 >
                   <CheckCheck className="h-4 w-4" />
                   <span>Mark all read</span>
@@ -355,7 +355,7 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
               )}
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"
               >
                 <X className="h-4 w-4 text-gray-500 dark:text-gray-400" />
               </button>
@@ -374,11 +374,10 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
                   <button
                     key={notification.id}
                     onClick={() => handleNotificationClick(notification)}
-                    className={`w-full text-left p-4 transition-colors duration-200 ${
-                      notification.isRead
+                    className={`w-full text-left p-4 transition-colors duration-200 ${notification.isRead
                         ? "hover:bg-gray-50 dark:hover:bg-gray-700"
                         : "bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30"
-                    }`}
+                      } cursor-pointer`}
                   >
                     <div className="flex items-start space-x-3">
                       <div className="flex-shrink-0 mt-1">

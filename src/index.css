@@ -114,6 +114,10 @@
     box-shadow: 0 0 0 3px rgba(240, 189, 48, 0.1);
   }
 
+  .input::placeholder {
+    color: #6b7280;
+  }
+
   .dark .input {
     background-color: #374151;
     border-color: #4b5563;
@@ -123,6 +127,10 @@
   .dark .input:focus {
     border-color: #f0bd30;
     box-shadow: 0 0 0 3px rgba(240, 189, 48, 0.1);
+  }
+
+  .dark .input::placeholder {
+    color: #ccc;
   }
 
   /* Reaction buttons */

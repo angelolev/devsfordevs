@@ -71,11 +71,11 @@ const CommentItem: React.FC<CommentItemProps> = ({
       <div className="flex space-x-3 mb-3">
         <button
           onClick={handleUserClick}
-          className="w-8 h-8 flex-shrink-0 hover:scale-105 transition-transform duration-200"
+          className="w-8 h-8 flex-shrink-0 hover:scale-105 transition-transform duration-200 cursor-pointer"
         >
-          {comment.author.avatar ? (
+          {comment.author.avatar_url ? (
             <img
-              src={comment.author.avatar}
+              src={comment.author.avatar_url}
               alt={comment.author.username}
               className="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-600"
             />
@@ -92,7 +92,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
             <div className="flex items-center space-x-2 mb-1">
               <button
                 onClick={handleUserClick}
-                className="font-bold text-sm text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                className="font-bold text-sm text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 cursor-pointer"
               >
                 @{comment.author.username}
               </button>
@@ -110,7 +110,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
             {canReply && user && (
               <button
                 onClick={() => setShowReplyForm(!showReplyForm)}
-                className="reaction-btn p-1.5"
+                className="reaction-btn p-1.5 cursor-pointer"
                 aria-label="Reply"
               >
                 <Reply className="h-4 w-4" />
@@ -120,7 +120,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
             {comment.replies && comment.replies.length > 0 && (
               <button
                 onClick={() => setShowReplies(!showReplies)}
-                className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200"
+                className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 cursor-pointer"
               >
                 {showReplies ? (
                   <ChevronUp className="h-3 w-3" />
@@ -149,7 +149,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 <button
                   type="submit"
                   disabled={!replyContent.trim()}
-                  className="btn-primary px-3 py-2"
+                  className="btn-primary px-3 py-2 cursor-pointer"
                 >
                   <Send className="h-4 w-4" />
                 </button>
@@ -230,9 +230,9 @@ const CommentSection: React.FC<CommentSectionProps> = ({
         <form onSubmit={handleSubmit} className="mb-4">
           <div className="flex space-x-3">
             <div className="w-8 h-8 flex-shrink-0">
-              {user.avatar ? (
+              {user.avatar_url ? (
                 <img
-                  src={user.avatar}
+                  src={user.avatar_url}
                   alt={user.username}
                   className="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-600"
                 />
@@ -257,7 +257,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                 <button
                   type="submit"
                   disabled={!newComment.trim()}
-                  className="btn-primary px-3 py-2"
+                  className="btn-primary px-3 py-2 cursor-pointer"
                 >
                   <Send className="h-4 w-4" />
                 </button>
