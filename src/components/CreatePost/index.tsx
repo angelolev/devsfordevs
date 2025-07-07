@@ -121,7 +121,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             onFocus={handleTextareaFocus}
-            placeholder="What's on your mind, developer?"
+            placeholder="¿Qué tienes para decir hoy?"
             className="input w-full resize-none transition-all duration-200"
             rows={isExpanded ? 3 : 2}
             maxLength={280}
@@ -196,7 +196,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
               <div className="flex items-center space-x-2 mb-3">
                 <Tag className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                 <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Select Topics ({selectedTopics.length})
+                  Elige temas ({selectedTopics.length})
                 </span>
               </div>
               <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto pt-2">
@@ -226,7 +226,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
             {selectedTopics.length > 0 && (
               <div className="flex flex-wrap items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
                 <span className="text-xs font-semibold text-gray-600 dark:text-gray-400 mr-2">
-                  Selected:
+                  Seleccionados:
                 </span>
                 {selectedTopics.map((topicId) => {
                   const topic = getTopicById(topicId);
@@ -257,7 +257,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
             {/* Action buttons at bottom */}
             <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-600">
               <div className="text-xs text-gray-500 dark:text-gray-400">
-                <p>Supported formats: JPG, PNG, GIF, WebP • Max size: 5MB</p>
+                <p>Formatos: JPG, PNG, GIF, WebP • Tamaño máximo: 5MB</p>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -267,7 +267,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
                   disabled={isUploading}
                   className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200 cursor-pointer"
                 >
-                  Cancel
+                  Cancelar
                 </button>
                 <button
                   type="submit"
@@ -281,12 +281,12 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
                   {isUploading ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>Posting...</span>
+                      <span>Publicando...</span>
                     </>
                   ) : (
                     <>
                       <Send className="h-4 w-4" />
-                      <span>Post</span>
+                      <span>Publicar</span>
                     </>
                   )}
                 </button>

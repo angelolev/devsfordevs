@@ -250,7 +250,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                   type="text"
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Add a comment..."
+                  placeholder="Añadir un comentario..."
                   className="input flex-1 text-sm"
                   maxLength={200}
                 />

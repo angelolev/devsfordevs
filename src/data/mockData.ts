@@ -4,7 +4,7 @@ const mockUsers: User[] = [
   {
     id: "1",
     username: "codemaster",
-    full_name: "Alex Rodriguez",
+    full_name: "Alejandro Rodriguez",
     email: "alex.rodriguez@gmail.com",
     avatar_url:
       "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100",
@@ -22,7 +22,7 @@ const mockUsers: User[] = [
   {
     id: "3",
     username: "pythonista",
-    full_name: "Michael Thompson",
+    full_name: "Miguel Torres",
     email: "michael.thompson@gmail.com",
     avatar_url:
       "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100",
@@ -34,7 +34,7 @@ export const mockPosts: Post[] = [
   {
     id: "1",
     content:
-      "Just discovered this amazing TypeScript feature that automatically infers complex union types. Mind blown! 🤯",
+      "Acabo de descubrir esta increíble característica de TypeScript que infiere automáticamente tipos de unión complejos. ¡Alucinante! 🤯",
     topics: ["typescript", "tutorial"],
     author: mockUsers[0],
     createdAt: new Date("2024-12-15T10:30:00"),
@@ -47,8 +47,8 @@ export const mockPosts: Post[] = [
   {
     id: "2",
     content:
-      "I hate PHP. There, I said it. The inconsistent function naming drives me crazy every single day.",
-    topics: ["php", "discussion"],
+      "Odio PHP. Ya lo he dicho. La nomenclatura inconsistente de las funciones me vuelve loco cada día.",
+    topics: ["php", "discusion"],
     image:
       "https://images.pexels.com/photos/177598/pexels-photo-177598.jpeg?auto=compress&cs=tinysrgb&w=800",
     author: mockUsers[1],
@@ -62,8 +62,8 @@ export const mockPosts: Post[] = [
   {
     id: "3",
     content:
-      "Hot take: CSS Grid is better than Flexbox for 90% of layouts. Fight me! 😤",
-    topics: ["css", "discussion"],
+      "Opinión impopular: CSS Grid es mejor que Flexbox para el 90% de los diseños. ¡Pelea conmigo! 😤",
+    topics: ["css", "discusion"],
     author: mockUsers[2],
     createdAt: new Date("2024-12-15T08:45:00"),
     reactions: {
@@ -75,8 +75,8 @@ export const mockPosts: Post[] = [
   {
     id: "4",
     content:
-      "Finally understood closures in JavaScript after 2 years of web development. Better late than never! 📚",
-    topics: ["javascript", "career", "tutorial"],
+      "Finalmente entendí los closures en JavaScript después de 2 años de desarrollo web. ¡Más vale tarde que nunca! 📚",
+    topics: ["javascript", "carrera", "tutorial"],
     image:
       "https://images.pexels.com/photos/546819/pexels-photo-546819.jpeg?auto=compress&cs=tinysrgb&w=800",
     author: mockUsers[0],
@@ -92,7 +92,7 @@ export const mockPosts: Post[] = [
 export const mockComments: Comment[] = [
   {
     id: "1",
-    content: "Same here! TypeScript keeps surprising me with its power.",
+    content: "¡Lo mismo digo! TypeScript no deja de sorprenderme con su poder.",
     author: mockUsers[1],
     postId: "1",
     createdAt: new Date("2024-12-15T10:45:00"),
@@ -100,14 +100,14 @@ export const mockComments: Comment[] = [
   {
     id: "2",
     content:
-      "Which feature specifically? I'm always looking to learn more TS tricks.",
+      "¿Qué característica específicamente? Siempre estoy buscando aprender más trucos de TS.",
     author: mockUsers[2],
     postId: "1",
     createdAt: new Date("2024-12-15T11:00:00"),
   },
   {
     id: "3",
-    content: "Conditional types and mapped types are game changers!",
+    content: "¡Los tipos condicionales y los tipos mapeados son un cambio de juego!",
     author: mockUsers[0],
     postId: "1",
     parentId: "2",
@@ -115,7 +115,7 @@ export const mockComments: Comment[] = [
   },
   {
     id: "4",
-    content: "Thanks! I'll look into those.",
+    content: "¡Gracias! Los investigaré.",
     author: mockUsers[2],
     postId: "1",
     parentId: "3",
@@ -124,7 +124,7 @@ export const mockComments: Comment[] = [
   {
     id: "5",
     content:
-      "PHP has its problems, but the ecosystem is solid. Laravel makes it bearable.",
+      "PHP tiene sus problemas, pero el ecosistema es sólido. Laravel lo hace soportable.",
     author: mockUsers[0],
     postId: "2",
     createdAt: new Date("2024-12-15T09:30:00"),
@@ -132,7 +132,7 @@ export const mockComments: Comment[] = [
   {
     id: "6",
     content:
-      "Laravel is great, but the language itself still has inconsistencies.",
+      "Laravel es genial, pero el lenguaje en sí todavía tiene inconsistencias.",
     author: mockUsers[1],
     postId: "2",
     parentId: "5",
@@ -140,7 +140,7 @@ export const mockComments: Comment[] = [
   },
   {
     id: "7",
-    content: "True, but every language has quirks. PHP 8+ is much better.",
+    content: "Cierto, pero cada lenguaje tiene sus peculiaridades. PHP 8+ es mucho mejor.",
     author: mockUsers[2],
     postId: "2",
     parentId: "6",

@@ -11,33 +11,34 @@ const LandingPage: React.FC = () => {
             <span className="h-4 w-4 bg-yellow-500 rounded-full"></span>
             <span className="h-4 w-4 bg-green-500 rounded-full"></span>
           </div>
-          <span className="text-sm">bash - DevConnect</span>
+          <span className="text-sm">bash - Dev4Devs</span>
         </div>
         <div className="text-lg">
           <p className="text-green-400">$ npm start</p>
-          <p>Starting DevConnect...</p>
+          <p>Iniciando Dev4Devs...</p>
           <br />
-          <p className="text-green-400">$ echo "Welcome to DevConnect"</p>
-          <p>Welcome to DevConnect</p>
+          <p className="text-green-400">$ echo "Bienvenido a Dev4Devs"</p>
+          <p>Bienvenido a Dev4Devs</p>
           <br />
           <p className="text-green-400">$ cat about.txt</p>
           <p>
-            A minimalistic social network built specifically for developers to
-            share thoughts, code snippets, and connect with the community.
+            Una red social minimalista creada específicamente para que los
+            desarrolladores compartan ideas, hablen de programación y se conecten
+            con la comunidad.
           </p>
           <br />
-          <p className="text-green-400">$ ls /features</p>
+          <p className="text-green-400">$ ls /caracteristicas</p>
           <ul className="list-disc list-inside">
-            <li>OAuth Authentication</li>
-            <li>Username Selection</li>
-            <li>Notifications System</li>
-            <li>Follow System</li>
-            <li>Image Upload</li>
-            <li>Dark/Light Theme</li>
-            <li>Nested Comments</li>
-            <li>Reactions</li>
-            <li>Topic Filtering</li>
-            <li>Responsive Design</li>
+            <li>Autenticación OAuth</li>
+            <li>Selección de nombre de usuario</li>
+            <li>Sistema de notificaciones</li>
+            <li>Sistema de seguimiento</li>
+            <li>Subida de imágenes</li>
+            <li>Tema oscuro/claro</li>
+            <li>Comentarios anidados</li>
+            <li>Reacciones</li>
+            <li>Filtrado por temas</li>
+            <li>Diseño adaptable</li>
           </ul>
           <br />
           <p className="text-green-400">$</p>
@@ -47,7 +48,7 @@ const LandingPage: React.FC = () => {
             to="/feed"
             className="bg-green-500 hover:bg-green-600 text-black font-bold py-2 px-4 rounded transition-colors duration-200"
           >
-            Enter DevConnect
+            Entrar a Dev4Devs
           </Link>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import Feed from "./pages/Feed";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -10,6 +10,7 @@ import { AuthModalType } from "./types";
 const AppContent: React.FC = () => {
   const [authModal, setAuthModal] = useState<AuthModalType>(null);
   const { isMissingUsername } = useAuth();
+  const location = useLocation();
 
   const handleAuthModal = (type: "login") => {
     setAuthModal(type);
@@ -21,7 +22,7 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#1a1a1a] transition-colors duration-200">
-      <Navbar onAuthModal={handleAuthModal} />
+      {location.pathname !== "/" && <Navbar onAuthModal={handleAuthModal} />}
       <main>
         <Routes>
           <Route path="/" element={<LandingPage />} />

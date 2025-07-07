@@ -165,7 +165,7 @@ const Post: React.FC<PostProps> = ({
           <Smile className="h-4 w-4" />
           <span>
             {post.reactions.happy.length}{" "}
-            <span className="hidden md:inline">upvotes</span>
+            <span className="hidden md:inline">smiles</span>
           </span>
         </button>
 
@@ -181,7 +181,7 @@ const Post: React.FC<PostProps> = ({
           <Frown className="h-4 w-4" />
           <span>
             {post.reactions.sad.length}{" "}
-            <span className="hidden md:inline">downvotes</span>
+            <span className="hidden md:inline">sads</span>
           </span>
         </button>
 
@@ -192,7 +192,7 @@ const Post: React.FC<PostProps> = ({
           <MessageCircle className="h-4 w-4" />
           <span>
             {post.commentsCount}{" "}
-            <span className="hidden md:inline">comments</span>
+            <span className="hidden md:inline">comentarios</span>
           </span>
         </button>
       </div>

@@ -190,9 +190,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
                                   className="w-full flex items-center space-x-3 px-3 py-3 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
                                 >
                                   <User className="h-5 w-5" />
-                                  <span className="font-medium">
-                                    My Profile
-                                  </span>
+                                  <span className="font-medium">Mi Perfil</span>
                                 </button>
 
                                 {isAdmin && (
@@ -202,7 +200,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
                                   >
                                     <Settings className="h-5 w-5" />
                                     <span className="font-medium">
-                                      Admin Dashboard
+                                      Panel de Administrador
                                     </span>
                                   </button>
                                 )}
@@ -212,7 +210,9 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
                                   className="w-full flex items-center space-x-3 px-3 py-3 text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-200"
                                 >
                                   <LogOut className="h-5 w-5" />
-                                  <span className="font-medium">Logout</span>
+                                  <span className="font-medium">
+                                    Cerrar Sesión
+                                  </span>
                                 </button>
                               </div>
 
@@ -266,7 +266,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
                             >
                               <User className="h-4 w-4" />
                               <span className="text-sm font-medium">
-                                My Profile
+                                Mi Perfil
                               </span>
                             </button>
 
@@ -277,7 +277,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
                               >
                                 <Settings className="h-4 w-4" />
                                 <span className="text-sm font-medium">
-                                  Admin Dashboard
+                                  Panel de Administrador
                                 </span>
                               </button>
                             )}
@@ -288,7 +288,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
                             >
                               <LogOut className="h-4 w-4" />
                               <span className="text-sm font-medium">
-                                Logout
+                                Cerrar Sesión
                               </span>
                             </button>
                           </div>
@@ -303,7 +303,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
                   className="flex items-center space-x-2 px-3 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200"
                 >
                   <LogIn className="h-5 w-5" />
-                  <span className="text-sm font-medium">Login</span>
+                  <span className="text-sm font-medium">Iniciar Sesión</span>
                 </button>
               )}
             </div>
