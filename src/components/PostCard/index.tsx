@@ -80,9 +80,9 @@ const Post: React.FC<PostProps> = ({
             onClick={handleUserClick}
             className="flex-shrink-0 hover:opacity-80 transition-opacity duration-200 cursor-pointer"
           >
-            {post.author.avatar ? (
+            {post.author.avatar_url ? (
               <img
-                src={post.author.avatar}
+                src={post.author.avatar_url}
                 alt={post.author.username}
                 className="w-12 h-12 rounded-md object-cover border-2 border-[#7aa2f7]"
               />
@@ -156,10 +156,11 @@ const Post: React.FC<PostProps> = ({
         <button
           onClick={() => handleReaction("happy")}
           disabled={!user}
-          className={`flex items-center space-x-1 text-base transition-colors duration-200 ${hasUserReacted("happy")
+          className={`flex items-center space-x-1 text-base transition-colors duration-200 ${
+            hasUserReacted("happy")
               ? "text-[#9ece6a]"
               : "text-[#565f89] hover:text-[#9ece6a]"
-            } ${!user ? "cursor-not-allowed opacity-50" : ""} cursor-pointer`}
+          } ${!user ? "cursor-not-allowed opacity-50" : ""} cursor-pointer`}
         >
           <Smile className="h-4 w-4" />
           <span>
@@ -171,10 +172,11 @@ const Post: React.FC<PostProps> = ({
         <button
           onClick={() => handleReaction("sad")}
           disabled={!user}
-          className={`flex items-center space-x-1 text-base transition-colors duration-200 ${hasUserReacted("sad")
+          className={`flex items-center space-x-1 text-base transition-colors duration-200 ${
+            hasUserReacted("sad")
               ? "text-[#f7768e]"
               : "text-[#565f89] hover:text-[#f7768e]"
-            } ${!user ? "cursor-not-allowed opacity-50" : ""} cursor-pointer`}
+          } ${!user ? "cursor-not-allowed opacity-50" : ""} cursor-pointer`}
         >
           <Frown className="h-4 w-4" />
           <span>
