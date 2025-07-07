@@ -22,12 +22,11 @@ const LandingPage: React.FC = () => {
           <br />
           <p className="text-green-400">$ cat about.txt</p>
           <p>
-            Una red social minimalista creada específicamente para que los
-            desarrolladores compartan ideas, hablen de programación y se conecten
-            con la comunidad.
+            Un lugar para que los desarrolladores compartan ideas, hablen de
+            programación y se conecten con la comunidad.
           </p>
           <br />
-          <p className="text-green-400">$ ls /caracteristicas</p>
+          <p className="text-green-400">$ ls /features</p>
           <ul className="list-disc list-inside">
             <li>Autenticación OAuth</li>
             <li>Selección de nombre de usuario</li>
@@ -38,7 +37,6 @@ const LandingPage: React.FC = () => {
             <li>Comentarios anidados</li>
             <li>Reacciones</li>
             <li>Filtrado por temas</li>
-            <li>Diseño adaptable</li>
           </ul>
           <br />
           <p className="text-green-400">$</p>

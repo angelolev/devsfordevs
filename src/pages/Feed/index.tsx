@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Filter } from "lucide-react";
 import { Post, Comment, User } from "../../types";
 import { mockPosts, mockComments } from "../../data/mockData";
@@ -110,6 +110,10 @@ const Feed: React.FC = () => {
   const handleClearAllFilters = () => {
     setSelectedFilterTopics([]);
   };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // Filter posts based on selected topics
   const filteredPosts = useMemo(() => {

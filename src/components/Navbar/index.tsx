@@ -303,7 +303,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
                   className="flex items-center space-x-2 px-3 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200"
                 >
                   <LogIn className="h-5 w-5" />
-                  <span className="text-sm font-medium">Iniciar Sesión</span>
+                  <span className="text-sm font-medium">Entrar</span>
                 </button>
               )}
             </div>
