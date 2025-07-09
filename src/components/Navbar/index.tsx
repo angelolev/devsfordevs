@@ -88,19 +88,6 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
 
             {/* Right Section */}
             <div className="flex items-center space-x-2 sm:space-x-4">
-              {/* Theme Toggle */}
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-lg"
-                aria-label="Toggle theme"
-              >
-                {theme === "light" ? (
-                  <Moon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-900" />
-                ) : (
-                  <Sun className="h-4 w-4 sm:h-5 sm:w-5 text-gray-900" />
-                )}
-              </button>
-
               {user ? (
                 <>
                   {/* Desktop Notifications */}
