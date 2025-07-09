@@ -44,44 +44,55 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
 
-      if (!session) {
+      if (event === "SIGNED_OUT" || !session) {
         setUser(null);
         localStorage.removeItem("user");
         setIsMissingUsername(false);
-        if (event === "SIGNED_OUT") {
-          navigate("/");
-        }
+        if (event === "SIGNED_OUT") navigate("/");
         return;
       }
 
-      const authUser = session.user;
-      const provider = authUser.app_metadata.provider as "google" | "github";
-      const metadata = authUser.user_metadata;
-      const { data: profile, error } = await supabase
-        .from("profiles")
-        .upsert({
-          id: authUser.id,
-          email: authUser.email,
-          full_name: provider === "google" ? metadata.full_name : metadata.name,
-          avatar_url:
-            provider === "google" ? metadata.picture : metadata.avatar_url,
-          provider: provider,
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error("Error upserting profile:", error);
-        setUser(null);
-        localStorage.removeItem("user");
-      } else {
-        setUser(profile as User);
-        localStorage.setItem("user", JSON.stringify(profile));
-        setIsMissingUsername(!profile.username_set);
-      }
-
       if (event === "SIGNED_IN") {
+        const authUser = session.user;
+        const provider = authUser.app_metadata.provider as "google" | "github";
+        const metadata = authUser.user_metadata;
+        const { data: profile, error } = await supabase
+          .from("profiles")
+          .upsert({
+            id: authUser.id,
+            email: authUser.email,
+            full_name:
+              provider === "google" ? metadata.full_name : metadata.name,
+            avatar_url:
+              provider === "google" ? metadata.picture : metadata.avatar_url,
+            provider: provider,
+          })
+          .select()
+          .single();
+
+        if (error) {
+          console.error("Error upserting profile:", error);
+          setUser(null);
+          localStorage.removeItem("user");
+        } else {
+          setUser(profile as User);
+          localStorage.setItem("user", JSON.stringify(profile));
+          setIsMissingUsername(!profile.username_set);
+        }
         navigate("/");
+      } else if (event === "USER_UPDATED") {
+        const { data: profile, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+
+        if (error) {
+          console.error("Error fetching updated profile:", error);
+        } else {
+          setUser(profile as User);
+          localStorage.setItem("user", JSON.stringify(profile));
+        }
       }
     });
 
@@ -118,7 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${window.location.origin}/feed`,
         },
       });
       if (error) throw error;
@@ -149,9 +160,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut({ scope: "global" });
       if (error) throw error;
-      navigate("/");
     } catch (error) {
       console.error("Error signing out:", error);
     } finally {
