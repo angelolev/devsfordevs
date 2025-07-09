@@ -74,7 +74,7 @@ const TopicSidebar: React.FC<TopicSidebarProps> = ({
 
         {/* Selected Topics Count */}
         {selectedTopics.length > 0 && (
-          <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+          <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-200 dark:border-blue-800">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">
                 Filtros activos ({selectedTopics.length})
@@ -110,7 +110,7 @@ const TopicSidebar: React.FC<TopicSidebarProps> = ({
             Available Topics
           </h4> */}
           <div
-            className={`flex flex-wrap gap-2 px-2 ${
+            className={`flex flex-wrap gap-2 p-2 ${
               isMobile ? "max-h-96" : "max-h-80"
             } overflow-y-auto`}
           >

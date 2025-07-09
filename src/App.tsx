@@ -21,7 +21,7 @@ const AppContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1a1a] transition-colors duration-200">
+    <div className="min-h-screen bg-[#1a1a1a] transition-colors duration-200">
       {location.pathname !== "/" && <Navbar onAuthModal={handleAuthModal} />}
       <main>
         <Routes>

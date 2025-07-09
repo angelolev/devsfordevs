@@ -58,7 +58,7 @@ const Post: React.FC<PostProps> = ({
   const postComments = comments.filter((comment) => comment.postId === post.id);
 
   return (
-    <article className="font-mono bg-[#1a1b26] rounded-lg border border-[#414868] shadow-lg overflow-hidden">
+    <article className="font-mono bg-[#23272e] rounded-lg border-gray-800 shadow-lg overflow-hidden">
       {/* Terminal Header */}
       <div className="bg-[#282a36] flex items-center justify-between px-4 py-2 border-b border-[#414868]">
         <div className="flex items-center space-x-2">

@@ -170,14 +170,15 @@ const Feed: React.FC = () => {
             <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-blue-700 dark:text-blue-300">
-                  Showing posts filtered by {selectedFilterTopics.length} topic
+                  Mostrando posts filtrados por {selectedFilterTopics.length}{" "}
+                  tema
                   {selectedFilterTopics.length !== 1 ? "s" : ""}
                 </span>
                 <button
                   onClick={handleClearAllFilters}
                   className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 underline cursor-pointer"
                 >
-                  Show all posts
+                  Ver todos los posts
                 </button>
               </div>
             </div>
@@ -199,13 +200,13 @@ const Feed: React.FC = () => {
           {filteredPosts.length === 0 && selectedFilterTopics.length > 0 && (
             <div className="text-center py-12">
               <p className="text-gray-500 dark:text-gray-400 mb-4">
-                No posts found for the selected topics.
+                No se encontraron posts para los temas seleccionados.
               </p>
               <button
                 onClick={handleClearAllFilters}
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 cursor-pointer"
               >
-                Clear Filters
+                Limpiar filtros
               </button>
             </div>
           )}
@@ -213,7 +214,7 @@ const Feed: React.FC = () => {
           {posts.length === 0 && (
             <div className="text-center py-12">
               <p className="text-gray-500 dark:text-gray-400">
-                No posts yet. Be the first to share something!
+                No hay posts todavía. Sé el primero en compartir algo!
               </p>
             </div>
           )}

@@ -88,24 +88,8 @@
     border-color: #e5e7eb;
   }
 
-  .dark .card {
-    background-color: #1f2937;
-    border-color: #374151;
-  }
-
   .card:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-
-  .dark .card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  }
-
-  .input {
-    @apply px-3 py-2 border rounded-lg transition-all duration-200;
-    background-color: white;
-    border-color: #d1d5db;
-    color: #111827;
   }
 
   .input:focus {
@@ -116,12 +100,6 @@
 
   .input::placeholder {
     color: #6b7280;
-  }
-
-  .dark .input {
-    background-color: #374151;
-    border-color: #4b5563;
-    color: #f9fafb;
   }
 
   .dark .input:focus {

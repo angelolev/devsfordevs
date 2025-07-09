@@ -26,13 +26,13 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      alert("Please select an image file");
+      alert("Por favor, selecciona una imagen");
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert("Image size must be less than 5MB");
+      alert("El tamaño de la imagen debe ser menor a 5MB");
       return;
     }
 
@@ -113,7 +113,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
   };
 
   return (
-    <div className="card p-6 mb-6">
+    <div className="card p-6 mb-6  bg-[#23272e] border-gray-800 shadow-lg">
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Main textarea */}
         <div className="relative">
@@ -121,8 +121,8 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             onFocus={handleTextareaFocus}
-            placeholder="¿Qué tienes para decir hoy?"
-            className="input w-full resize-none transition-all duration-200"
+            placeholder="<>¿Qué tienes para decir hoy?</>"
+            className="input w-full resize-none transition-all duration-200 px-3 py-2 border rounded-lg bg-white border-[#d1d5db] text-[#111827]  dark:bg-[#1a1a1a] dark:border-[#4b5563] dark:text-[#f9fafb]"
             rows={isExpanded ? 3 : 2}
             maxLength={280}
             disabled={isUploading}
@@ -195,11 +195,11 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
             <div>
               <div className="flex items-center space-x-2 mb-3">
                 <Tag className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                <span className="text-sm font-semibold text-gray-500 dark:text-gray-300">
                   Elige temas ({selectedTopics.length})
                 </span>
               </div>
-              <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto pt-2">
+              <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2">
                 {AVAILABLE_TOPICS.map((topic) => {
                   const isSelected = selectedTopics.includes(topic.id);
                   return (
@@ -265,7 +265,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
                   type="button"
                   onClick={handleCancel}
                   disabled={isUploading}
-                  className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200 cursor-pointer"
+                  className="px-4 py-2 text-sm font-medium text-red-400   transition-colors duration-200 cursor-pointer"
                 >
                   Cancelar
                 </button>
