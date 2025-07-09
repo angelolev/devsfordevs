@@ -79,7 +79,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           localStorage.setItem("user", JSON.stringify(profile));
           setIsMissingUsername(!profile.username_set);
         }
-        navigate("/");
       } else if (event === "USER_UPDATED") {
         const { data: profile, error } = await supabase
           .from("profiles")
