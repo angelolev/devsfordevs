@@ -66,8 +66,8 @@ const Post: React.FC<PostProps> = ({
           <span className="w-3 h-3 bg-[#ffbd2e] rounded-full"></span>
           <span className="w-3 h-3 bg-[#28c940] rounded-full"></span>
         </div>
-        <div className="text-xs text-[#c0caf5]">
-          {post.author.username}@devsocial — zsh
+        <div className="text-xs md:text-base text-[#c0caf5]">
+          {post.author.username}@devs4devs — zsh
         </div>
         <div></div>
       </div>
@@ -101,7 +101,7 @@ const Post: React.FC<PostProps> = ({
             <div className="flex items-center justify-between mb-2">
               <button
                 onClick={handleUserClick}
-                className="text-[#7aa2f7] text-sm hover:underline cursor-pointer"
+                className="text-[#7aa2f7] text-sm md:text-base hover:underline cursor-pointer"
               >
                 <span className="text-[#e0af68]">~/{post.author.username}</span>
               </button>
@@ -111,7 +111,7 @@ const Post: React.FC<PostProps> = ({
             </div>
 
             {/* Post Text */}
-            <div className="text-[#c0caf5] text-sm whitespace-pre-wrap mb-4">
+            <div className="text-[#c0caf5] text-sm md:text-base whitespace-pre-wrap mb-4">
               <span className="text-[#9ece6a] mr-2">$</span>
               {post.content}
             </div>
