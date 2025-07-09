@@ -13,7 +13,7 @@ const LandingPage: React.FC = () => {
           </div>
           <span className="text-sm">bash - Dev4Devs</span>
         </div>
-        <div className="text-lg">
+        <div className="text-base md:text-lg">
           <p className="text-green-400">$ npm start</p>
           <p>Iniciando Dev4Devs...</p>
           <br />
