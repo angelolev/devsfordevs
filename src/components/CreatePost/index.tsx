@@ -122,7 +122,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
             onChange={(e) => setContent(e.target.value)}
             onFocus={handleTextareaFocus}
             placeholder="<>¿Qué tienes para decir hoy?</>"
-            className="input w-full resize-none transition-all duration-200 px-3 py-2 border rounded-lg bg-white border-[#d1d5db] text-[#111827]  dark:bg-[#1a1a1a] dark:border-[#4b5563] dark:text-[#f9fafb]"
+            className="input text-sm md:text-base w-full resize-none transition-all duration-200 px-3 py-2 border rounded-lg bg-white border-[#d1d5db] text-[#111827]  dark:bg-[#1a1a1a] dark:border-[#4b5563] dark:text-[#f9fafb]"
             rows={isExpanded ? 3 : 2}
             maxLength={280}
             disabled={isUploading}
@@ -171,6 +171,9 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
               onChange={handleFileSelect}
               className="hidden"
             />
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              <p>Formatos: JPG, PNG, GIF, WebP • Tamaño máximo: 5MB</p>
+            </div>
 
             {/* Image preview */}
             {imagePreview && (
@@ -255,11 +258,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
             )}
 
             {/* Action buttons at bottom */}
-            <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-600">
-              <div className="text-xs text-gray-500 dark:text-gray-400">
-                <p>Formatos: JPG, PNG, GIF, WebP • Tamaño máximo: 5MB</p>
-              </div>
-
+            <div className="flex items-start md:items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-600">
               <div className="flex items-center space-x-2">
                 <button
                   type="button"
