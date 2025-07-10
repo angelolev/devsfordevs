@@ -1,15 +1,32 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Filter } from "lucide-react";
 import { Post, Comment, User } from "../../types";
-import { mockPosts, mockComments } from "../../data/mockData";
 import { useNavigate } from "react-router-dom";
 import { PostCard, TopicSidebar } from "../../components";
 import { useAuth } from "../../contexts/AuthContext";
 import CreatePost from "../../components/CreatePost";
+import { createPost, getPosts } from "../../lib/supabase";
+
+type PostDetails = {
+  id: string;
+  content: string;
+  image_url: string | null;
+  created_at: string;
+  author: {
+    id: string;
+    username: string;
+    full_name: string | null;
+    avatar_url: string | null;
+  };
+  topics: string[];
+  comments_count: number;
+};
 
 const Feed: React.FC = () => {
-  const [posts, setPosts] = useState<Post[]>(mockPosts);
-  const [comments, setComments] = useState<Comment[]>(mockComments);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedFilterTopics, setSelectedFilterTopics] = useState<string[]>(
     []
   );
@@ -17,28 +34,86 @@ const Feed: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const handleCreatePost = (
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setIsLoading(true);
+        const fetchedPosts = await getPosts();
+        if (!fetchedPosts) {
+          setPosts([]);
+          return;
+        }
+
+        const formattedPosts: Post[] = (fetchedPosts as PostDetails[]).map(
+          (post) => ({
+            id: post.id,
+            content: post.content,
+            image: post.image_url ?? undefined,
+            createdAt: new Date(post.created_at),
+            author: {
+              id: post.author.id,
+              username: post.author.username,
+              full_name: post.author.full_name ?? undefined,
+              avatar_url: post.author.avatar_url ?? undefined,
+            },
+            topics: post.topics,
+            commentsCount: post.comments_count,
+            reactions: { happy: [], sad: [] }, // Placeholder
+          })
+        );
+
+        setPosts(formattedPosts);
+      } catch (err) {
+        setError("Failed to fetch posts. Please try again later.");
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
+  const handleCreatePost = async (
     content: string,
     topics: string[],
     image?: string
   ) => {
     if (!user) return;
 
-    const newPost: Post = {
-      id: Date.now().toString(),
-      content,
-      image,
-      topics,
-      author: user,
-      createdAt: new Date(),
-      reactions: {
-        happy: [],
-        sad: [],
-      },
-      commentsCount: 0,
-    };
+    try {
+      const newPostData = (await createPost(
+        {
+          content,
+          author_id: user.id,
+          image_url: image,
+        },
+        topics
+      )) as PostDetails;
 
-    setPosts((prev) => [newPost, ...prev]);
+      if (!newPostData) return;
+
+      const formattedPost: Post = {
+        id: newPostData.id,
+        content: newPostData.content,
+        image: newPostData.image_url ?? undefined,
+        createdAt: new Date(newPostData.created_at),
+        author: {
+          id: newPostData.author.id,
+          username: newPostData.author.username,
+          full_name: newPostData.author.full_name ?? undefined,
+          avatar_url: newPostData.author.avatar_url ?? undefined,
+        },
+        topics: newPostData.topics,
+        commentsCount: newPostData.comments_count,
+        reactions: { happy: [], sad: [] }, // Placeholder
+      };
+
+      setPosts((prev) => [formattedPost, ...prev]);
+    } catch (error) {
+      console.error("Failed to create post:", error);
+      alert("There was an error creating your post. Please try again.");
+    }
   };
 
   const handleReaction = (postId: string, type: "happy" | "sad") => {
@@ -165,8 +240,22 @@ const Feed: React.FC = () => {
         <div className="flex-1 max-w-full lg:max-w-2xl">
           <CreatePost onCreatePost={handleCreatePost} />
 
+          {isLoading && (
+            <div className="text-center py-12">
+              <p className="text-gray-500 dark:text-gray-400">
+                Loading posts...
+              </p>
+            </div>
+          )}
+
+          {error && (
+            <div className="text-center py-12">
+              <p className="text-red-500 dark:text-red-400">{error}</p>
+            </div>
+          )}
+
           {/* Filter Status */}
-          {selectedFilterTopics.length > 0 && (
+          {!isLoading && !error && selectedFilterTopics.length > 0 && (
             <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-blue-700 dark:text-blue-300">
@@ -197,21 +286,23 @@ const Feed: React.FC = () => {
             ))}
           </div>
 
-          {filteredPosts.length === 0 && selectedFilterTopics.length > 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500 dark:text-gray-400 mb-4">
-                No se encontraron posts para los temas seleccionados.
-              </p>
-              <button
-                onClick={handleClearAllFilters}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 cursor-pointer"
-              >
-                Limpiar filtros
-              </button>
-            </div>
-          )}
+          {!isLoading &&
+            filteredPosts.length === 0 &&
+            selectedFilterTopics.length > 0 && (
+              <div className="text-center py-12">
+                <p className="text-gray-500 dark:text-gray-400 mb-4">
+                  No se encontraron posts para los temas seleccionados.
+                </p>
+                <button
+                  onClick={handleClearAllFilters}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 cursor-pointer"
+                >
+                  Limpiar filtros
+                </button>
+              </div>
+            )}
 
-          {posts.length === 0 && (
+          {!isLoading && posts.length === 0 && (
             <div className="text-center py-12">
               <p className="text-gray-500 dark:text-gray-400">
                 No hay posts todavía. Sé el primero en compartir algo!

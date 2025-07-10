@@ -2,7 +2,7 @@ export interface User {
   id: string;
   username?: string;
   full_name?: string;
-  email: string;
+  email?: string;
   avatar_url?: string;
   provider?: "google" | "github";
   username_set?: boolean;

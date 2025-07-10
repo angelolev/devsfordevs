@@ -63,3 +63,64 @@ export const deleteImage = async (imageUrl: string): Promise<void> => {
     // Don't throw error for deletion failures to avoid blocking other operations
   }
 };
+
+export const getPosts = async () => {
+  const { data, error } = await supabase.rpc("get_posts_with_details");
+
+  if (error) {
+    console.error("Error fetching posts:", error);
+    throw new Error(error.message);
+  }
+
+  return data;
+};
+
+export const createPost = async (
+  postData: {
+    content: string;
+    author_id: string;
+    image_url?: string;
+  },
+  topics: string[]
+) => {
+  // 1. Create the post
+  const { data: newPost, error: postError } = await supabase
+    .from("posts")
+    .insert(postData)
+    .select("id")
+    .single();
+
+  if (postError) {
+    console.error("Error creating post:", postError);
+    throw new Error(postError.message);
+  }
+
+  // 2. Link topics if any
+  if (topics.length > 0) {
+    const topicLinks = topics.map((topicId) => ({
+      post_id: newPost.id,
+      topic_id: topicId,
+    }));
+    const { error: topicsError } = await supabase
+      .from("post_topics")
+      .insert(topicLinks);
+
+    if (topicsError) {
+      console.error("Error linking topics:", topicsError);
+      // We should probably delete the post if linking topics fails
+      throw new Error(topicsError.message);
+    }
+  }
+
+  // 3. Fetch the newly created post with all its details
+  const { data: fullPost, error: fetchError } = await supabase
+    .rpc("get_post_details_by_id", { p_id: newPost.id })
+    .single();
+
+  if (fetchError) {
+    console.error("Error fetching new post:", fetchError);
+    throw new Error(fetchError.message);
+  }
+
+  return fullPost;
+};
