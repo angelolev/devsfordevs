@@ -143,7 +143,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                   value={replyContent}
                   onChange={(e) => setReplyContent(e.target.value)}
                   placeholder={`Reply to @${comment.author.username}...`}
-                  className="input flex-1 text-sm"
+                  className="input flex-1 text-sm px-3 py-2 border rounded-lg bg-white border-[#d1d5db] text-[#111827]  dark:bg-[#1a1a1a] dark:border-[#4b5563] dark:text-[#f9fafb]"
                   maxLength={200}
                 />
                 <button
@@ -251,7 +251,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   placeholder="Añadir un comentario..."
-                  className="input flex-1 text-sm"
+                  className="input flex-1 text-sm px-3 py-2 border rounded-lg bg-white border-[#d1d5db] text-[#111827]  dark:bg-[#1a1a1a] dark:border-[#4b5563] dark:text-[#f9fafb]"
                   maxLength={200}
                 />
                 <button

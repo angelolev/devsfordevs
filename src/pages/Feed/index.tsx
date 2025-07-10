@@ -5,7 +5,12 @@ import { useNavigate } from "react-router-dom";
 import { PostCard, TopicSidebar } from "../../components";
 import { useAuth } from "../../contexts/AuthContext";
 import CreatePost from "../../components/CreatePost";
-import { createPost, getPosts } from "../../lib/supabase";
+import {
+  createPost,
+  getPosts,
+  createComment,
+  getCommentsForPosts,
+} from "../../lib/supabase";
 
 type PostDetails = {
   id: string;
@@ -22,6 +27,20 @@ type PostDetails = {
   comments_count: number;
 };
 
+type FetchedComment = {
+  id: string;
+  content: string;
+  created_at: string;
+  parent_id: string | null;
+  post_id: string;
+  author: {
+    id: string;
+    username: string | null;
+    full_name: string | null;
+    avatar_url: string | null;
+  };
+};
+
 const Feed: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -35,12 +54,13 @@ const Feed: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchPosts = async () => {
+    const fetchPostsAndComments = async () => {
       try {
         setIsLoading(true);
         const fetchedPosts = await getPosts();
-        if (!fetchedPosts) {
+        if (!fetchedPosts || fetchedPosts.length === 0) {
           setPosts([]);
+          setComments([]);
           return;
         }
 
@@ -63,6 +83,50 @@ const Feed: React.FC = () => {
         );
 
         setPosts(formattedPosts);
+
+        const postIds = formattedPosts.map((p) => p.id);
+        if (postIds.length > 0) {
+          const fetchedComments = await getCommentsForPosts(postIds);
+
+          if (fetchedComments) {
+            const formattedComments: Comment[] = (
+              fetchedComments as FetchedComment[]
+            )
+              .map((comment) => {
+                if (!comment.author) {
+                  return null;
+                }
+                const author = comment.author;
+
+                const authorData: User = { id: author.id };
+                if (author.username) {
+                  authorData.username = author.username;
+                }
+                if (author.full_name) {
+                  authorData.full_name = author.full_name;
+                }
+                if (author.avatar_url) {
+                  authorData.avatar_url = author.avatar_url;
+                }
+
+                const newComment: Comment = {
+                  id: comment.id,
+                  content: comment.content,
+                  author: authorData,
+                  postId: comment.post_id,
+                  createdAt: new Date(comment.created_at),
+                };
+
+                if (comment.parent_id) {
+                  newComment.parentId = comment.parent_id;
+                }
+
+                return newComment;
+              })
+              .filter((c): c is Comment => c !== null);
+            setComments(formattedComments);
+          }
+        }
       } catch (err) {
         setError("Failed to fetch posts. Please try again later.");
         console.error(err);
@@ -71,8 +135,8 @@ const Feed: React.FC = () => {
       }
     };
 
-    fetchPosts();
-  }, []);
+    fetchPostsAndComments();
+  }, [user]);
 
   const handleCreatePost = async (
     content: string,
@@ -144,30 +208,44 @@ const Feed: React.FC = () => {
     );
   };
 
-  const handleComment = (
+  const handleComment = async (
     postId: string,
     content: string,
     parentId?: string
   ) => {
     if (!user) return;
 
-    const newComment: Comment = {
-      id: Date.now().toString(),
-      content,
-      author: user,
-      postId,
-      parentId,
-      createdAt: new Date(),
-    };
+    try {
+      const newCommentData = await createComment({
+        post_id: postId,
+        author_id: user.id,
+        content,
+        parent_id: parentId,
+      });
 
-    setComments((prev) => [...prev, newComment]);
-    setPosts((prev) =>
-      prev.map((post) =>
-        post.id === postId
-          ? { ...post, commentsCount: post.commentsCount + 1 }
-          : post
-      )
-    );
+      if (!newCommentData) return;
+
+      const formattedComment: Comment = {
+        id: newCommentData.id,
+        content: newCommentData.content,
+        author: user,
+        postId: postId,
+        parentId: newCommentData.parent_id,
+        createdAt: new Date(newCommentData.created_at),
+      };
+
+      setComments((prev) => [...prev, formattedComment]);
+      setPosts((prev) =>
+        prev.map((post) =>
+          post.id === postId
+            ? { ...post, commentsCount: post.commentsCount + 1 }
+            : post
+        )
+      );
+    } catch (error) {
+      console.error("Failed to create comment:", error);
+      alert("There was an error creating your comment. Please try again.");
+    }
   };
 
   const handleUserClick = (clickedUser: User) => {

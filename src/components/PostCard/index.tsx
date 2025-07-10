@@ -8,7 +8,7 @@ interface PostProps {
   post: PostType;
   comments: Comment[];
   onReaction: (postId: string, type: "happy" | "sad") => void;
-  onComment: (postId: string, content: string) => void;
+  onComment: (postId: string, content: string, parentId?: string) => void;
   onUserClick?: (user: User) => void;
 }
 
@@ -192,7 +192,9 @@ const Post: React.FC<PostProps> = ({
           <MessageCircle className="h-4 w-4" />
           <span>
             {post.commentsCount}{" "}
-            <span className="hidden md:inline">comentarios</span>
+            <span className="hidden md:inline">
+              comentario{post.commentsCount > 1 ? "s" : ""}
+            </span>
           </span>
         </button>
       </div>

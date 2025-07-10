@@ -94,7 +94,7 @@
 
   .input:focus {
     outline: none;
-    border-color: #f0bd30;
+    border-color: #ccc;
     box-shadow: 0 0 0 3px rgba(240, 189, 48, 0.1);
   }
 
@@ -103,7 +103,7 @@
   }
 
   .dark .input:focus {
-    border-color: #f0bd30;
+    border-color: #ccc;
     box-shadow: 0 0 0 3px rgba(240, 189, 48, 0.1);
   }
 

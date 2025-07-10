@@ -75,6 +75,34 @@ export const getPosts = async () => {
   return data;
 };
 
+export const getCommentsForPosts = async (postIds: string[]) => {
+  const { data, error } = await supabase
+    .from("comments")
+    .select(
+      `
+      id,
+      content,
+      created_at,
+      parent_id,
+      post_id,
+      author:profiles!inner (
+        id,
+        username,
+        full_name,
+        avatar_url
+      )
+    `
+    )
+    .in("post_id", postIds);
+
+  if (error) {
+    console.error("Error fetching comments:", error);
+    throw new Error(error.message);
+  }
+
+  return data;
+};
+
 export const createPost = async (
   postData: {
     content: string;
@@ -123,4 +151,31 @@ export const createPost = async (
   }
 
   return fullPost;
+};
+
+export const createComment = async (commentData: {
+  content: string;
+  author_id: string;
+  post_id: string;
+  parent_id?: string;
+}) => {
+  const { data, error } = await supabase
+    .from("comments")
+    .insert(commentData)
+    .select(
+      `
+      id,
+      content,
+      created_at,
+      parent_id
+    `
+    )
+    .single();
+
+  if (error) {
+    console.error("Error creating comment:", error);
+    throw new Error(error.message);
+  }
+
+  return data;
 };
