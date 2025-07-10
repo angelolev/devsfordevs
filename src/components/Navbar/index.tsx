@@ -1,7 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
-  Moon,
-  Sun,
   Code,
   LogIn,
   User,
@@ -10,7 +8,6 @@ import {
   ChevronUp,
   Settings,
 } from "lucide-react";
-import { useTheme } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import NotificationsDropdown from "../NotificationsDropdown";
@@ -20,7 +17,6 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
-  const { theme, toggleTheme } = useTheme();
   const { user, signOut } = useAuth();
 
   const navigate = useNavigate();
