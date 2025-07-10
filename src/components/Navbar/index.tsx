@@ -54,9 +54,10 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
   };
 
   const handleLogout = () => {
-    signOut();
-    setShowUserMenu(false);
-    navigate("/"); // Redirect to home after logout
+    signOut(() => {
+      setShowUserMenu(false);
+      navigate("/"); // Redirect to home after logout
+    });
   };
 
   const handleUnreadCountChange = (count: number) => {
@@ -270,9 +271,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
                               className="w-full flex items-center space-x-3 px-4 py-2 text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200"
                             >
                               <LogOut className="h-4 w-4" />
-                              <span className="text-sm font-medium">
-                                Cerrar Sesión
-                              </span>
+                              <span className="font-medium">Cerrar Sesión</span>
                             </button>
                           </div>
                         </div>

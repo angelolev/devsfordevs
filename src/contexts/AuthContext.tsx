@@ -9,7 +9,7 @@ interface AuthContextType {
   session: Session | null;
   signInWithGoogle: () => Promise<void>;
   signInWithGitHub: () => Promise<void>;
-  signOut: () => Promise<void>;
+  signOut: (callback?: () => void) => Promise<void>;
   isLoading: boolean;
   isMissingUsername: boolean;
   updateProfile: (username: string) => Promise<void>;
@@ -160,11 +160,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signOut = async () => {
+  const signOut = async (callback?: () => void) => {
     setIsLoading(true);
     try {
       const { error } = await supabase.auth.signOut({ scope: "global" });
       if (error) throw error;
+      setUser(null);
+      localStorage.removeItem("user");
+      setIsMissingUsername(false);
+      if (callback) callback();
     } catch (error) {
       console.error("Error signing out:", error);
     } finally {

@@ -90,7 +90,7 @@ const Feed: React.FC = () => {
 
           if (fetchedComments) {
             const formattedComments: Comment[] = (
-              fetchedComments as FetchedComment[]
+              fetchedComments as unknown as FetchedComment[]
             )
               .map((comment) => {
                 if (!comment.author) {
@@ -301,7 +301,7 @@ const Feed: React.FC = () => {
       {/* Mobile Filter Overlay */}
       {showMobileFilters && (
         <div className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50">
-          <div className="absolute inset-x-0 top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600 max-h-[80vh] overflow-y-auto">
+          <div className="absolute inset-x-0 top-0 min-h-screen bg-gray-800 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600 max-h-[80vh] overflow-y-auto">
             <TopicSidebar
               selectedTopics={selectedFilterTopics}
               onTopicToggle={handleTopicFilterToggle}
