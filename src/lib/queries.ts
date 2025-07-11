@@ -293,7 +293,7 @@ export const useToggleReaction = () => {
       // Return a context object with the snapshot for rollback
       return { previousPosts };
     },
-    onError: (err, variables, context) => {
+    onError: (err, _variables, context) => {
       // If the mutation fails, rollback to the previous state
       if (context?.previousPosts) {
         queryClient.setQueryData(queryKeys.posts, context.previousPosts);

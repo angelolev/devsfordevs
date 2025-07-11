@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { Image, Send, X, Loader2, Tag } from "lucide-react";
+import { Send, X, Loader2, Tag } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { uploadImage } from "../../lib/supabase";
 import { AVAILABLE_TOPICS, Topic } from "../../types";
@@ -98,9 +98,9 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
     }
   };
 
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
+  // const triggerFileInput = () => {
+  //   fileInputRef.current?.click();
+  // };
 
   const handleTextareaFocus = () => {
     setIsExpanded(true);
