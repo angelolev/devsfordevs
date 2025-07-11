@@ -150,7 +150,7 @@ const TopicSidebar: React.FC<TopicSidebarProps> = ({
           <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
             <button
               onClick={onClose}
-              className="w-full btn-primary cursor-pointer"
+              className="w-full btn-primary cursor-pointer text-white"
             >
               Aplicar filtros
             </button>

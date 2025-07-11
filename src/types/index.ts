@@ -149,7 +149,7 @@ export const AVAILABLE_TOPICS: Topic[] = [
   },
   {
     id: "mobile",
-    name: "Mobile Dev",
+    name: "Mobile",
     color: "text-emerald-700 dark:text-emerald-400",
     bgColor: "bg-emerald-100 dark:bg-emerald-900/20",
   },
@@ -172,14 +172,14 @@ export const AVAILABLE_TOPICS: Topic[] = [
     bgColor: "bg-sky-100 dark:bg-sky-900/20",
   },
   {
-    id: "question",
-    name: "Question",
+    id: "pregunta",
+    name: "Pregunta",
     color: "text-gray-400 dark:text-gray-400",
     bgColor: "bg-gray-100 dark:bg-gray-900/20",
   },
   {
-    id: "discussion",
-    name: "Discussion",
+    id: "discusion",
+    name: "Discusión",
     color: "text-stone-400 dark:text-stone-400",
     bgColor: "bg-stone-100 dark:bg-stone-900/20",
   },

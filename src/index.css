@@ -30,13 +30,13 @@
 @layer components {
   .btn-primary {
     @apply px-4 py-2 font-semibold rounded-lg transition-all duration-200 shadow-sm;
-    background-color: #f0bd30;
+    background-color: #7158e2;
     color: #1f2937;
-    border: 1px solid #e6a82a;
+    border: 1px solid #7d5fff;
   }
 
-  .btn-primary:hover {
-    background-color: #e6a82a;
+  /* .btn-primary:hover {
+    background-color: #7d5fff;
     color: #111827;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(240, 189, 48, 0.3);
@@ -45,10 +45,10 @@
   .btn-primary:active {
     transform: translateY(0);
     box-shadow: 0 2px 4px rgba(240, 189, 48, 0.2);
-  }
+  } */
 
   .btn-primary:disabled {
-    background-color: #f0bd30;
+    background-color: #7158e2;
     color: #1f2937;
     opacity: 0.5;
     transform: none;

@@ -68,9 +68,9 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
     <>
       <nav
         className="sticky top-0 z-50 backdrop-blur-md border-b border-gray-800/20"
-        style={{ backgroundColor: "#f0bd30" }}
+        style={{ backgroundColor: "#7158e2" }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
           <div className="flex justify-between items-center h-16">
             {/* Logo Section */}
             <button
@@ -99,7 +99,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
                     {/* User Menu Button */}
                     <button
                       onClick={() => setShowUserMenu(!showUserMenu)}
-                      className="flex items-center space-x-2 rounded-lg px-2 py-1"
+                      className="flex items-center space-x-2 rounded-lg px-2 py-1 cursor-pointer"
                     >
                       {/* User Avatar */}
                       <div className="w-8 h-8 flex-shrink-0">
@@ -243,10 +243,10 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
                           </div>
 
                           {/* Menu Options */}
-                          <div className="py-2">
+                          <div className="py-0">
                             <button
                               onClick={handleMyProfile}
-                              className="w-full flex items-center space-x-3 px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                              className="w-full flex items-center space-x-3 px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 cursor-pointer"
                             >
                               <User className="h-4 w-4" />
                               <span className="text-sm font-medium">
@@ -257,7 +257,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
                             {isAdmin && (
                               <button
                                 onClick={handleAdminDashboard}
-                                className="w-full flex items-center space-x-3 px-4 py-2 text-left text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors duration-200"
+                                className="w-full flex items-center space-x-3 px-4 py-2 text-left text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors duration-200 cursor-pointer"
                               >
                                 <Settings className="h-4 w-4" />
                                 <span className="text-sm font-medium">
@@ -268,7 +268,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
 
                             <button
                               onClick={handleLogout}
-                              className="w-full flex items-center space-x-3 px-4 py-2 text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200"
+                              className="w-full flex items-center space-x-3 px-4 py-2 text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 cursor-pointer"
                             >
                               <LogOut className="h-4 w-4" />
                               <span className="font-medium">Cerrar Sesión</span>
@@ -282,7 +282,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
               ) : (
                 <button
                   onClick={() => onAuthModal("login")}
-                  className="flex items-center space-x-2 px-3 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200"
+                  className="flex items-center space-x-2 px-3 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200 cursor-pointer"
                 >
                   <LogIn className="h-5 w-5" />
                   <span className="text-sm font-medium">Entrar</span>

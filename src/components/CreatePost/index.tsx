@@ -130,9 +130,9 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
 
           {/* Character count and image button aligned */}
           {isExpanded && (
-            <div className="flex items-center justify-between mt-2">
+            <div className="flex items-center justify-end mt-2">
               {/* Image upload button - icon only */}
-              <button
+              {/* <button
                 type="button"
                 onClick={triggerFileInput}
                 disabled={isUploading}
@@ -144,7 +144,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
                 title={selectedFile ? "Change image" : "Add image"}
               >
                 <Image className="h-5 w-5" />
-              </button>
+              </button> */}
 
               {/* Character count */}
               <span
@@ -171,9 +171,9 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
               onChange={handleFileSelect}
               className="hidden"
             />
-            <div className="text-xs text-gray-500 dark:text-gray-400">
+            {/* <div className="text-xs text-gray-500 dark:text-gray-400">
               <p>Formatos: JPG, PNG, GIF, WebP • Tamaño máximo: 5MB</p>
-            </div>
+            </div> */}
 
             {/* Image preview */}
             {imagePreview && (
@@ -275,7 +275,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
                     isUploading || !content.trim()
                       ? "opacity-60 cursor-not-allowed"
                       : ""
-                  } cursor-pointer`}
+                  } cursor-pointer text-white`}
                 >
                   {isUploading ? (
                     <>
@@ -284,7 +284,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
                     </>
                   ) : (
                     <>
-                      <Send className="h-4 w-4" />
+                      <Send color="#fff" className="h-4 w-4" />
                       <span>Publicar</span>
                     </>
                   )}

@@ -151,7 +151,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                   disabled={!replyContent.trim()}
                   className="btn-primary px-3 py-2 cursor-pointer"
                 >
-                  <Send className="h-4 w-4" />
+                  <Send color="#fff" className="h-4 w-4" />
                 </button>
               </div>
             </form>
@@ -259,7 +259,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                   disabled={!newComment.trim()}
                   className="btn-primary px-3 py-2 cursor-pointer"
                 >
-                  <Send className="h-4 w-4" />
+                  <Send color="#fff" className="h-4 w-4" />
                 </button>
               </div>
             </div>
