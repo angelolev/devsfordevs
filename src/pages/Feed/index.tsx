@@ -10,6 +10,7 @@ import {
   useComments,
   useCreatePost,
   useCreateComment,
+  useToggleReaction,
 } from "../../lib/queries";
 
 const Feed: React.FC = () => {
@@ -37,6 +38,7 @@ const Feed: React.FC = () => {
 
   const createPostMutation = useCreatePost();
   const createCommentMutation = useCreateComment();
+  const toggleReactionMutation = useToggleReaction();
 
   // Combine loading states
   const isLoading = postsLoading || commentsLoading;
@@ -68,10 +70,11 @@ const Feed: React.FC = () => {
   const handleReaction = (postId: string, type: "happy" | "sad") => {
     if (!user) return;
 
-    // TODO: Implement optimistic updates for reactions
-    // For now, this will update local state only
-    // In a real app, you'd want to sync this with the backend
-    console.log("Reaction:", { postId, type, userId: user.id });
+    toggleReactionMutation.mutate({
+      postId,
+      userId: user.id,
+      reactionType: type,
+    });
   };
 
   const handleComment = async (

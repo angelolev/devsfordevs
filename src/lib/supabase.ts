@@ -179,3 +179,105 @@ export const createComment = async (commentData: {
 
   return data;
 };
+
+// Reaction functions
+export const toggleReaction = async (
+  postId: string,
+  userId: string,
+  reactionType: "happy" | "sad"
+) => {
+  try {
+    // Check if user already reacted with this type
+    const { data: existingReaction, error: checkError } = await supabase
+      .from("post_reactions")
+      .select("id")
+      .eq("post_id", postId)
+      .eq("user_id", userId)
+      .eq("reaction_type", reactionType)
+      .maybeSingle(); // Use maybeSingle() instead of single() to avoid error when no rows found
+
+    if (checkError) {
+      throw checkError;
+    }
+
+    if (existingReaction) {
+      // Remove existing reaction
+      const { error: deleteError } = await supabase
+        .from("post_reactions")
+        .delete()
+        .eq("id", existingReaction.id);
+
+      if (deleteError) {
+        throw deleteError;
+      }
+
+      return { action: "removed", reactionType };
+    } else {
+      // Add new reaction (remove opposite reaction first if exists)
+      const oppositeType = reactionType === "happy" ? "sad" : "happy";
+
+      // Remove opposite reaction if exists (use maybeSingle here too)
+      await supabase
+        .from("post_reactions")
+        .delete()
+        .eq("post_id", postId)
+        .eq("user_id", userId)
+        .eq("reaction_type", oppositeType);
+
+      // Add new reaction
+      const { error: insertError } = await supabase
+        .from("post_reactions")
+        .insert({
+          post_id: postId,
+          user_id: userId,
+          reaction_type: reactionType,
+        });
+
+      if (insertError) {
+        throw insertError;
+      }
+
+      return { action: "added", reactionType };
+    }
+  } catch (error) {
+    console.error("Error toggling reaction:", error);
+    throw new Error("Failed to update reaction");
+  }
+};
+
+export const getPostReactions = async (postIds: string[]) => {
+  try {
+    const { data, error } = await supabase
+      .from("post_reactions")
+      .select("post_id, user_id, reaction_type")
+      .in("post_id", postIds);
+
+    if (error) {
+      throw error;
+    }
+
+    // Group reactions by post and type
+    const reactionsByPost: Record<string, { happy: string[]; sad: string[] }> =
+      {};
+
+    postIds.forEach((postId) => {
+      reactionsByPost[postId] = { happy: [], sad: [] };
+    });
+
+    data?.forEach((reaction) => {
+      if (
+        reactionsByPost[reaction.post_id] &&
+        (reaction.reaction_type === "happy" || reaction.reaction_type === "sad")
+      ) {
+        reactionsByPost[reaction.post_id][
+          reaction.reaction_type as "happy" | "sad"
+        ].push(reaction.user_id);
+      }
+    });
+
+    return reactionsByPost;
+  } catch (error) {
+    console.error("Error fetching reactions:", error);
+    throw new Error("Failed to fetch reactions");
+  }
+};

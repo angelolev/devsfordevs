@@ -4,6 +4,8 @@ import {
   getCommentsForPosts,
   createPost as createPostAPI,
   createComment as createCommentAPI,
+  getPostReactions,
+  toggleReaction,
 } from "./supabase";
 import { Post, Comment, User } from "../types";
 
@@ -55,6 +57,12 @@ export const usePosts = () => {
         return [];
       }
 
+      // Get post IDs for fetching reactions
+      const postIds = (fetchedPosts as PostDetails[]).map((post) => post.id);
+
+      // Fetch reactions for all posts
+      const reactions = await getPostReactions(postIds);
+
       const formattedPosts: Post[] = (fetchedPosts as PostDetails[]).map(
         (post) => ({
           id: post.id,
@@ -69,7 +77,7 @@ export const usePosts = () => {
           },
           topics: post.topics,
           commentsCount: post.comments_count,
-          reactions: { happy: [], sad: [] }, // Placeholder
+          reactions: reactions[post.id] || { happy: [], sad: [] },
         })
       );
 
@@ -217,6 +225,84 @@ export const useCreateComment = () => {
     },
     onError: (error: Error) => {
       console.error("Failed to create comment:", error);
+    },
+  });
+};
+
+// Mutation hook for toggling reactions with optimistic updates
+export const useToggleReaction = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      postId,
+      userId,
+      reactionType,
+    }: {
+      postId: string;
+      userId: string;
+      reactionType: "happy" | "sad";
+    }) => {
+      return await toggleReaction(postId, userId, reactionType);
+    },
+    onMutate: async ({ postId, userId, reactionType }) => {
+      // Cancel any outgoing refetches to avoid overwriting optimistic update
+      await queryClient.cancelQueries({ queryKey: queryKeys.posts });
+
+      // Snapshot the previous value
+      const previousPosts = queryClient.getQueryData<Post[]>(queryKeys.posts);
+
+      // Optimistically update the cache
+      if (previousPosts) {
+        const updatedPosts = previousPosts.map((post) => {
+          if (post.id === postId) {
+            const oppositeType = reactionType === "happy" ? "sad" : "happy";
+            const hasCurrentReaction =
+              post.reactions[reactionType].includes(userId);
+            const hasOppositeReaction =
+              post.reactions[oppositeType].includes(userId);
+
+            const newReactions = { ...post.reactions };
+
+            if (hasCurrentReaction) {
+              // Remove current reaction
+              newReactions[reactionType] = newReactions[reactionType].filter(
+                (id) => id !== userId
+              );
+            } else {
+              // Add current reaction and remove opposite if exists
+              newReactions[reactionType] = [
+                ...newReactions[reactionType],
+                userId,
+              ];
+              if (hasOppositeReaction) {
+                newReactions[oppositeType] = newReactions[oppositeType].filter(
+                  (id) => id !== userId
+                );
+              }
+            }
+
+            return { ...post, reactions: newReactions };
+          }
+          return post;
+        });
+
+        queryClient.setQueryData(queryKeys.posts, updatedPosts);
+      }
+
+      // Return a context object with the snapshot for rollback
+      return { previousPosts };
+    },
+    onError: (err, variables, context) => {
+      // If the mutation fails, rollback to the previous state
+      if (context?.previousPosts) {
+        queryClient.setQueryData(queryKeys.posts, context.previousPosts);
+      }
+      console.error("Failed to toggle reaction:", err);
+    },
+    onSettled: () => {
+      // Always refetch after success or error to ensure we have the correct state
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts });
     },
   });
 };
