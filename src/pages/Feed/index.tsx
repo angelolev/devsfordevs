@@ -143,7 +143,7 @@ const Feed: React.FC = () => {
         <div className="lg:hidden mb-6">
           <button
             onClick={() => setShowMobileFilters(true)}
-            className="flex items-center space-x-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-white cursor-pointer"
+            className="flex items-center space-x-2 px-4 py-2 btn-primary dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-sm  dark:hover:bg-gray-700 transition-colors text-white cursor-pointer"
           >
             <Filter className="w-4 h-4" />
             <span>Filtrar por tema</span>
@@ -158,7 +158,7 @@ const Feed: React.FC = () => {
         {/* Mobile Filters Overlay */}
         {showMobileFilters && (
           <div className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50">
-            <div className="absolute inset-x-0 top-0 min-h-screen bg-[#1a1a1a] dark:bg-[#1a1a1a] border-b border-gray-200 dark:border-gray-600 max-h-[80vh] overflow-y-auto pt-10">
+            <div className="absolute inset-x-0 top-0 min-h-screen bg-[#1a1a1a] dark:bg-[#1a1a1a] border-b border-gray-200 dark:border-gray-600 max-h-[80vh] overflow-y-auto pt-10 px-4">
               <TopicSidebar
                 selectedTopics={selectedFilterTopics}
                 onTopicToggle={handleTopicFilterToggle}

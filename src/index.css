@@ -29,10 +29,9 @@
 
 @layer components {
   .btn-primary {
-    @apply px-4 py-2 font-semibold rounded-lg transition-all duration-200 shadow-sm;
+    @apply px-4 py-2 font-semibold rounded-lg transition-all duration-200 shadow-sm border border-gray-200;
     background-color: #7158e2;
     color: #1f2937;
-    border: 1px solid #7d5fff;
   }
 
   /* .btn-primary:hover {
