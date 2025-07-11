@@ -13,6 +13,7 @@ interface AuthContextType {
   isLoading: boolean;
   isMissingUsername: boolean;
   updateProfile: (username: string) => Promise<void>;
+  authLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,6 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(getStoredUser());
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
   const [isMissingUsername, setIsMissingUsername] = useState(() => {
     const storedUser = getStoredUser();
     return storedUser ? !storedUser.username_set : false;
@@ -39,63 +41,98 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let mounted = true;
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!mounted) return;
+
       setSession(session);
 
       if (event === "SIGNED_OUT" || !session) {
         setUser(null);
         localStorage.removeItem("user");
         setIsMissingUsername(false);
+        setAuthLoading(false);
         if (event === "SIGNED_OUT") navigate("/");
         return;
       }
 
-      if (event === "SIGNED_IN") {
-        const authUser = session.user;
-        const provider = authUser.app_metadata.provider as "google" | "github";
-        const metadata = authUser.user_metadata;
-        const { data: profile, error } = await supabase
-          .from("profiles")
-          .upsert({
-            id: authUser.id,
-            email: authUser.email,
-            full_name:
-              provider === "google" ? metadata.full_name : metadata.name,
-            avatar_url:
-              provider === "google" ? metadata.picture : metadata.avatar_url,
-            provider: provider,
-          })
-          .select()
-          .single();
+      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        // Set authLoading to false immediately so components can proceed
+        setAuthLoading(false);
 
-        if (error) {
-          console.error("Error upserting profile:", error);
-          setUser(null);
-          localStorage.removeItem("user");
-        } else {
-          setUser(profile as User);
-          localStorage.setItem("user", JSON.stringify(profile));
-          setIsMissingUsername(!profile.username_set);
-        }
+        // Handle profile upsert asynchronously without blocking
+        const handleProfileUpsert = async () => {
+          try {
+            const authUser = session.user;
+            const provider = authUser.app_metadata.provider as
+              | "google"
+              | "github";
+            const metadata = authUser.user_metadata;
+
+            const { data: profile, error } = await supabase
+              .from("profiles")
+              .upsert({
+                id: authUser.id,
+                email: authUser.email,
+                full_name:
+                  provider === "google" ? metadata.full_name : metadata.name,
+                avatar_url:
+                  provider === "google"
+                    ? metadata.picture
+                    : metadata.avatar_url,
+                provider: provider,
+              })
+              .select()
+              .single();
+
+            if (error) {
+              console.error("Error upserting profile:", error);
+              setUser(null);
+              localStorage.removeItem("user");
+            } else {
+              setUser(profile as User);
+              localStorage.setItem("user", JSON.stringify(profile));
+              setIsMissingUsername(!profile.username_set);
+            }
+          } catch (error) {
+            console.error("Error in profile upsert:", error);
+            setUser(null);
+            localStorage.removeItem("user");
+          }
+        };
+
+        handleProfileUpsert();
       } else if (event === "USER_UPDATED") {
-        const { data: profile, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", session.user.id)
-          .single();
+        try {
+          const { data: profile, error } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .single();
 
-        if (error) {
-          console.error("Error fetching updated profile:", error);
-        } else {
-          setUser(profile as User);
-          localStorage.setItem("user", JSON.stringify(profile));
+          if (error) {
+            console.error("Error fetching updated profile:", error);
+          } else {
+            setUser(profile as User);
+            localStorage.setItem("user", JSON.stringify(profile));
+          }
+        } catch (error) {
+          console.error("Error in USER_UPDATED handler:", error);
         }
+        setAuthLoading(false);
+      } else {
+        // For any other events, just mark as not loading
+        setAuthLoading(false);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   const updateProfile = async (username: string) => {
@@ -187,6 +224,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         isMissingUsername,
         updateProfile,
+        authLoading,
       }}
     >
       {children}

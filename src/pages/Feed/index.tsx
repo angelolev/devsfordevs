@@ -50,14 +50,23 @@ const Feed: React.FC = () => {
     []
   );
   const [showMobileFilters, setShowMobileFilters] = useState(false);
-  const { user } = useAuth();
+  const { user, authLoading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Don't fetch posts while auth is still loading to prevent clearing posts during refresh
+    if (authLoading) {
+      return;
+    }
+
     const fetchPostsAndComments = async () => {
       try {
         setIsLoading(true);
+        setError(null);
+        setPosts([]); // Clear posts immediately when starting to load
+        setComments([]); // Clear comments as well
         const fetchedPosts = await getPosts();
+
         if (!fetchedPosts || fetchedPosts.length === 0) {
           setPosts([]);
           setComments([]);
@@ -128,15 +137,15 @@ const Feed: React.FC = () => {
           }
         }
       } catch (err) {
+        console.error("Error fetching posts:", err);
         setError("Failed to fetch posts. Please try again later.");
-        console.error(err);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchPostsAndComments();
-  }, [user]);
+  }, [authLoading, user]);
 
   const handleCreatePost = async (
     content: string,
