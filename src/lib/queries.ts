@@ -1,6 +1,12 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
 import {
   getPosts,
+  getPostsPaginated,
   getCommentsForPosts,
   createPost as createPostAPI,
   createComment as createCommentAPI,
@@ -12,6 +18,7 @@ import { Post, Comment, User } from "../types";
 // Query keys for consistent caching
 export const queryKeys = {
   posts: ["posts"] as const,
+  paginatedPosts: ["paginatedPosts"] as const,
   comments: (postIds: string[]) => ["comments", postIds] as const,
   userProfile: (userId: string) => ["profile", userId] as const,
 } as const;
@@ -83,6 +90,59 @@ export const usePosts = () => {
 
       return formattedPosts;
     },
+    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    refetchOnMount: false, // Don't refetch on component mount if data exists
+  });
+};
+
+// Custom hook for fetching posts with pagination and caching
+export const usePaginatedPosts = () => {
+  return useInfiniteQuery({
+    queryKey: queryKeys.paginatedPosts,
+    queryFn: async ({ pageParam = 0 }): Promise<Post[]> => {
+      const fetchedPosts = await getPostsPaginated(20, pageParam);
+
+      if (!fetchedPosts || fetchedPosts.length === 0) {
+        return [];
+      }
+
+      // Get post IDs for fetching reactions
+      const postIds = (fetchedPosts as PostDetails[]).map((post) => post.id);
+
+      // Fetch reactions for all posts
+      const reactions = await getPostReactions(postIds);
+
+      const formattedPosts: Post[] = (fetchedPosts as PostDetails[]).map(
+        (post) => ({
+          id: post.id,
+          content: post.content,
+          image: post.image_url ?? undefined,
+          createdAt: new Date(post.created_at),
+          author: {
+            id: post.author.id,
+            username: post.author.username,
+            full_name: post.author.full_name ?? undefined,
+            avatar_url: post.author.avatar_url ?? undefined,
+          },
+          topics: post.topics,
+          commentsCount: post.comments_count,
+          reactions: reactions[post.id] || { happy: [], sad: [] },
+        })
+      );
+
+      return formattedPosts;
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      // If the last page has fewer than 20 posts, there are no more pages
+      if (lastPage.length < 20) {
+        return undefined;
+      }
+      // Return the offset for the next page
+      return allPages.length * 20;
+    },
+    initialPageParam: 0,
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
     gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
     refetchOnWindowFocus: false, // Don't refetch when window regains focus
@@ -176,6 +236,7 @@ export const useCreatePost = () => {
     onSuccess: () => {
       // Invalidate and refetch posts to include the new post
       queryClient.invalidateQueries({ queryKey: queryKeys.posts });
+      queryClient.invalidateQueries({ queryKey: queryKeys.paginatedPosts });
 
       // Optionally, we could also do optimistic updates here
       // by directly updating the cache without refetching
@@ -222,6 +283,7 @@ export const useCreateComment = () => {
 
       // Also invalidate posts to update comment counts
       queryClient.invalidateQueries({ queryKey: queryKeys.posts });
+      queryClient.invalidateQueries({ queryKey: queryKeys.paginatedPosts });
     },
     onError: (error: Error) => {
       console.error("Failed to create comment:", error);
@@ -248,9 +310,14 @@ export const useToggleReaction = () => {
     onMutate: async ({ postId, userId, reactionType }) => {
       // Cancel any outgoing refetches to avoid overwriting optimistic update
       await queryClient.cancelQueries({ queryKey: queryKeys.posts });
+      await queryClient.cancelQueries({ queryKey: queryKeys.paginatedPosts });
 
       // Snapshot the previous value
       const previousPosts = queryClient.getQueryData<Post[]>(queryKeys.posts);
+      const previousPaginatedPosts = queryClient.getQueryData<{
+        pages: Post[][];
+        pageParams: number[];
+      }>(queryKeys.paginatedPosts);
 
       // Optimistically update the cache
       if (previousPosts) {
@@ -290,19 +357,72 @@ export const useToggleReaction = () => {
         queryClient.setQueryData(queryKeys.posts, updatedPosts);
       }
 
+      // Optimistically update the paginated posts cache
+      if (previousPaginatedPosts) {
+        const updatedPaginatedData = {
+          ...previousPaginatedPosts,
+          pages: previousPaginatedPosts.pages.map((page: Post[]) =>
+            page.map((post) => {
+              if (post.id === postId) {
+                const oppositeType = reactionType === "happy" ? "sad" : "happy";
+                const hasCurrentReaction =
+                  post.reactions[reactionType].includes(userId);
+                const hasOppositeReaction =
+                  post.reactions[oppositeType].includes(userId);
+
+                const newReactions = { ...post.reactions };
+
+                if (hasCurrentReaction) {
+                  // Remove current reaction
+                  newReactions[reactionType] = newReactions[
+                    reactionType
+                  ].filter((id) => id !== userId);
+                } else {
+                  // Add current reaction and remove opposite if exists
+                  newReactions[reactionType] = [
+                    ...newReactions[reactionType],
+                    userId,
+                  ];
+                  if (hasOppositeReaction) {
+                    newReactions[oppositeType] = newReactions[
+                      oppositeType
+                    ].filter((id) => id !== userId);
+                  }
+                }
+
+                return { ...post, reactions: newReactions };
+              }
+              return post;
+            })
+          ),
+        };
+
+        queryClient.setQueryData(
+          queryKeys.paginatedPosts,
+          updatedPaginatedData
+        );
+      }
+
       // Return a context object with the snapshot for rollback
-      return { previousPosts };
+      return { previousPosts, previousPaginatedPosts };
     },
     onError: (err, _variables, context) => {
       // If the mutation fails, rollback to the previous state
       if (context?.previousPosts) {
         queryClient.setQueryData(queryKeys.posts, context.previousPosts);
       }
+      if (context?.previousPaginatedPosts) {
+        queryClient.setQueryData(
+          queryKeys.paginatedPosts,
+          context.previousPaginatedPosts
+        );
+      }
       console.error("Failed to toggle reaction:", err);
     },
     onSettled: () => {
       // Always refetch after success or error to ensure we have the correct state
       queryClient.invalidateQueries({ queryKey: queryKeys.posts });
+      queryClient.invalidateQueries({ queryKey: queryKeys.paginatedPosts });
     },
   });
 };

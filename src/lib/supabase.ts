@@ -75,6 +75,34 @@ export const getPosts = async () => {
   return data;
 };
 
+export const getPostsPaginated = async (
+  limit: number = 20,
+  offset: number = 0
+) => {
+  // For now, use the existing RPC function and apply pagination manually
+  // TODO: Create a proper paginated RPC function in Supabase for better performance
+  const { data, error } = await supabase.rpc("get_posts_with_details");
+
+  if (error) {
+    console.error("Error fetching paginated posts:", error);
+    throw new Error(error.message);
+  }
+
+  if (!data) return [];
+
+  // Apply pagination manually (not optimal for large datasets)
+  // Sort by created_at desc to get latest posts first
+  const sortedData = data.sort(
+    (a: { created_at: string }, b: { created_at: string }) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
+
+  // Apply pagination
+  const paginatedData = sortedData.slice(offset, offset + limit);
+
+  return paginatedData;
+};
+
 export const getCommentsForPosts = async (postIds: string[]) => {
   const { data, error } = await supabase
     .from("comments")

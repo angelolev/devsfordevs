@@ -6,7 +6,7 @@ import { PostCard, TopicSidebar } from "../../components";
 import { useAuth } from "../../contexts/AuthContext";
 import CreatePost from "../../components/CreatePost";
 import {
-  usePosts,
+  usePaginatedPosts,
   useComments,
   useCreatePost,
   useCreateComment,
@@ -21,13 +21,19 @@ const Feed: React.FC = () => {
   const { user, authLoading } = useAuth();
   const navigate = useNavigate();
 
-  // Use React Query hooks for data fetching with caching
+  // Use React Query hooks for data fetching with caching and pagination
   const {
-    data: posts = [],
+    data: paginatedPostsData,
     isLoading: postsLoading,
     error: postsError,
-    refetch: refetchPosts,
-  } = usePosts();
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = usePaginatedPosts();
+
+  // Flatten all pages into a single array of posts
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const posts = paginatedPostsData?.pages.flat() || [];
 
   const postIds = posts.map((post) => post.id);
   const {
@@ -137,7 +143,7 @@ const Feed: React.FC = () => {
   }
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-8">
+    <div className="px-4 sm:px-6 lg:px-8 py-16">
       <div className="max-w-7xl mx-auto">
         {/* Mobile Filter Button */}
         <div className="lg:hidden mb-6">
@@ -200,7 +206,7 @@ const Feed: React.FC = () => {
                     : "Failed to fetch posts. Please try again later."}
                 </p>
                 <button
-                  onClick={() => refetchPosts()}
+                  onClick={() => fetchNextPage()}
                   className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                 >
                   Try Again
@@ -242,12 +248,32 @@ const Feed: React.FC = () => {
                     />
                   ))
                 )}
+
+                {/* Load More Button */}
+                {hasNextPage && (
+                  <div className="flex justify-center mt-8">
+                    <button
+                      onClick={() => fetchNextPage()}
+                      disabled={isFetchingNextPage}
+                      className="px-6 py-3 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white rounded-lg font-medium transition-colors flex items-center space-x-2"
+                    >
+                      {isFetchingNextPage ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>Cargando...</span>
+                        </>
+                      ) : (
+                        <span>Cargar más posts</span>
+                      )}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
 
           {/* Desktop Sidebar */}
-          <div className="hidden lg:block w-fit">
+          <div className="hidden lg:block w-fit sticky top-20 self-start">
             <TopicSidebar
               selectedTopics={selectedFilterTopics}
               onTopicToggle={handleTopicFilterToggle}

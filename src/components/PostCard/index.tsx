@@ -165,7 +165,7 @@ const Post: React.FC<PostProps> = ({
             hasUserReacted("happy")
               ? "text-[#9ece6a]"
               : "text-[#565f89] hover:text-[#9ece6a]"
-          } ${!user ? "cursor-not-allowed opacity-50" : ""} cursor-pointer`}
+          } ${!user ? "cursor-not-allowed" : "cursor-pointer"}`}
         >
           <Smile className="h-4 w-4" />
           <span>
@@ -181,7 +181,7 @@ const Post: React.FC<PostProps> = ({
             hasUserReacted("sad")
               ? "text-[#f7768e]"
               : "text-[#565f89] hover:text-[#f7768e]"
-          } ${!user ? "cursor-not-allowed opacity-50" : ""} cursor-pointer`}
+          } ${!user ? "cursor-not-allowed" : "cursor-pointer"}`}
         >
           <Frown className="h-4 w-4" />
           <span>
