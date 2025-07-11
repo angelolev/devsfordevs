@@ -281,3 +281,67 @@ export const getPostReactions = async (postIds: string[]) => {
     throw new Error("Failed to fetch reactions");
   }
 };
+
+// User profile functions
+export const getUserProfile = async (username: string) => {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("username", username)
+    .single();
+
+  if (error) {
+    console.error("Error fetching user profile:", error);
+    throw new Error(error.message);
+  }
+
+  return data;
+};
+
+export const getUserPosts = async (userId: string) => {
+  const { data, error } = await supabase.rpc("get_posts_with_details");
+
+  if (error) {
+    console.error("Error fetching user posts:", error);
+    throw new Error(error.message);
+  }
+
+  // Filter posts by the specific user and format them properly
+  const userPosts = data?.filter(
+    (post: { author: { id: string } }) => post.author.id === userId
+  );
+
+  // Transform the data to match the Post interface
+  return (
+    userPosts?.map(
+      (post: {
+        id: string;
+        content: string;
+        image_url?: string;
+        created_at: string;
+        author: {
+          id: string;
+          username: string;
+          full_name?: string;
+          avatar_url?: string;
+        };
+        topics?: string[];
+        comments_count?: number;
+      }) => ({
+        id: post.id,
+        content: post.content,
+        image: post.image_url ?? undefined,
+        createdAt: new Date(post.created_at), // Convert string to Date object
+        author: {
+          id: post.author.id,
+          username: post.author.username,
+          full_name: post.author.full_name ?? undefined,
+          avatar_url: post.author.avatar_url ?? undefined,
+        },
+        topics: post.topics || [],
+        commentsCount: post.comments_count || 0,
+        reactions: { happy: [], sad: [] }, // We'll need to fetch reactions separately if needed
+      })
+    ) || []
+  );
+};

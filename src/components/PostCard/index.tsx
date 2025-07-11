@@ -23,6 +23,11 @@ const Post: React.FC<PostProps> = ({
   const { user } = useAuth();
 
   const formatDate = (date: Date) => {
+    // Safety check for invalid dates
+    if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+      return "Unknown";
+    }
+
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const minutes = Math.floor(diff / 60000);

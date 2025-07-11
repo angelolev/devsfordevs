@@ -6,6 +6,7 @@ export interface User {
   avatar_url?: string;
   provider?: "google" | "github";
   username_set?: boolean;
+  created_at?: string;
 }
 
 export interface Post {
