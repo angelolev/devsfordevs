@@ -1,7 +1,19 @@
-import React, { useState } from "react";
-import { Smile, Frown, MessageCircle, Tag } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import {
+  Smile,
+  Frown,
+  MessageCircle,
+  Tag,
+  UserPlus,
+  UserCheck,
+} from "lucide-react";
 import { Post as PostType, Comment, AVAILABLE_TOPICS, User } from "../../types";
 import { useAuth } from "../../contexts/AuthContext";
+import {
+  useFollowStatus,
+  useFollowUser,
+  useUnfollowUser,
+} from "../../lib/queries";
 import CommentSection from "../CommentsSection";
 
 interface PostProps {
@@ -20,7 +32,16 @@ const Post: React.FC<PostProps> = ({
   onUserClick,
 }) => {
   const [showComments, setShowComments] = useState(false);
+  const [showUserPopup, setShowUserPopup] = useState(false);
+  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+  const [isPopupLocked, setIsPopupLocked] = useState(false);
+  const popupTimerRef = useRef<NodeJS.Timeout | null>(null);
   const { user } = useAuth();
+
+  // Follow status and mutations
+  const { data: isFollowing } = useFollowStatus(user?.id, post.author.id);
+  const followUserMutation = useFollowUser();
+  const unfollowUserMutation = useUnfollowUser();
 
   const formatDate = (date: Date) => {
     // Safety check for invalid dates
@@ -56,6 +77,72 @@ const Post: React.FC<PostProps> = ({
     }
   };
 
+  const handleFollowClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user) {
+      alert("Inicia sesión para seguir usuarios");
+      return;
+    }
+
+    if (isFollowing) {
+      unfollowUserMutation.mutate({
+        followerId: user.id,
+        followingId: post.author.id,
+      });
+    } else {
+      followUserMutation.mutate({
+        followerId: user.id,
+        followingId: post.author.id,
+      });
+    }
+  };
+
+  const handleMouseEnter = (e: React.MouseEvent) => {
+    setPopupPosition({
+      x: e.clientX,
+      y: e.clientY + 10, // Offset slightly below cursor
+    });
+    setShowUserPopup(true);
+    setIsPopupLocked(false);
+
+    // Clear any existing timer
+    if (popupTimerRef.current) {
+      clearTimeout(popupTimerRef.current);
+    }
+
+    // Lock the popup position after 500ms
+    popupTimerRef.current = setTimeout(() => {
+      setIsPopupLocked(true);
+    }, 500);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (showUserPopup && !isPopupLocked) {
+      setPopupPosition({
+        x: e.clientX,
+        y: e.clientY + 10,
+      });
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setShowUserPopup(false);
+    setIsPopupLocked(false);
+    if (popupTimerRef.current) {
+      clearTimeout(popupTimerRef.current);
+      popupTimerRef.current = null;
+    }
+  };
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (popupTimerRef.current) {
+        clearTimeout(popupTimerRef.current);
+      }
+    };
+  }, []);
+
   const getTopicById = (id: string) => {
     return AVAILABLE_TOPICS.find((topic) => topic.id === id);
   };
@@ -81,24 +168,29 @@ const Post: React.FC<PostProps> = ({
       <div className="p-4">
         <div className="flex items-start space-x-4">
           {/* Avatar */}
-          <button
-            onClick={handleUserClick}
-            className="flex-shrink-0 hover:opacity-80 transition-opacity duration-200 cursor-pointer"
-          >
-            {post.author.avatar_url ? (
-              <img
-                src={post.author.avatar_url}
-                alt={post.author.username}
-                className="w-12 h-12 rounded-md object-cover border-2 border-[#7aa2f7]"
-              />
-            ) : (
-              <div className="w-12 h-12 bg-[#282a36] border-2 border-[#7aa2f7] rounded-md flex items-center justify-center">
-                <span className="text-[#7aa2f7] font-bold text-xl">
-                  {post.author.username?.charAt(0).toUpperCase()}
-                </span>
-              </div>
-            )}
-          </button>
+          <div className="relative">
+            <button
+              onClick={handleUserClick}
+              onMouseEnter={handleMouseEnter}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+              className="flex-shrink-0 hover:opacity-80 transition-opacity duration-200 cursor-pointer"
+            >
+              {post.author.avatar_url ? (
+                <img
+                  src={post.author.avatar_url}
+                  alt={post.author.username}
+                  className="w-12 h-12 rounded-md object-cover border-2 border-[#7aa2f7]"
+                />
+              ) : (
+                <div className="w-12 h-12 bg-[#282a36] border-2 border-[#7aa2f7] rounded-md flex items-center justify-center">
+                  <span className="text-[#7aa2f7] font-bold text-xl">
+                    {post.author.username?.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
+            </button>
+          </div>
 
           {/* Content Body */}
           <div className="flex-1 min-w-0">
@@ -106,7 +198,10 @@ const Post: React.FC<PostProps> = ({
             <div className="flex items-center justify-between mb-2">
               <button
                 onClick={handleUserClick}
-                className="text-[#7aa2f7] text-sm md:text-base hover:underline cursor-pointer"
+                onMouseEnter={handleMouseEnter}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+                className="text-[#7aa2f7] text-sm md:text-base hover:underline cursor-pointer transition-colors duration-200"
               >
                 <span className="text-[#e0af68]">~/{post.author.username}</span>
               </button>
@@ -211,6 +306,71 @@ const Post: React.FC<PostProps> = ({
           onComment={onComment}
           onUserClick={onUserClick}
         />
+      )}
+
+      {/* User Popup - Positioned at cursor */}
+      {showUserPopup && (
+        <div
+          className="fixed z-50 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 animate-fade-in"
+          style={{
+            left: `${Math.min(popupPosition.x, window.innerWidth - 320)}px`,
+            top: `${Math.min(popupPosition.y, window.innerHeight - 200)}px`,
+          }}
+          onMouseEnter={() => setShowUserPopup(true)}
+          onMouseLeave={handleMouseLeave}
+        >
+          <div className="p-4">
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0">
+                {post.author.avatar_url ? (
+                  <img
+                    src={post.author.avatar_url}
+                    alt={post.author.username}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
+                    <span className="text-gray-600 dark:text-gray-300 font-bold text-xl">
+                      {post.author.username?.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-gray-900 dark:text-white font-medium truncate">
+                  {post.author.full_name || post.author.username || "Usuario"}
+                </div>
+                <div className="text-gray-600 dark:text-gray-400 text-sm truncate">
+                  @{post.author.username || "usuario"}
+                </div>
+              </div>
+            </div>
+
+            {user && user.id !== post.author.id && (
+              <button
+                onClick={handleFollowClick}
+                disabled={
+                  followUserMutation.isPending || unfollowUserMutation.isPending
+                }
+                className={`mt-3 w-full px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center justify-center space-x-2 ${
+                  isFollowing
+                    ? "bg-gray-600 hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600 text-white"
+                    : "bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white"
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
+                {followUserMutation.isPending ||
+                unfollowUserMutation.isPending ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : isFollowing ? (
+                  <UserCheck className="h-4 w-4" />
+                ) : (
+                  <UserPlus className="h-4 w-4" />
+                )}
+                <span>{isFollowing ? "Siguiendo" : "Seguir"}</span>
+              </button>
+            )}
+          </div>
+        </div>
       )}
     </article>
   );

@@ -373,3 +373,186 @@ export const getUserPosts = async (userId: string) => {
     ) || []
   );
 };
+
+// Follow functions
+export const followUser = async (followerId: string, followingId: string) => {
+  try {
+    // Check if already following
+    const { data: existingFollow, error: checkError } = await supabase
+      .from("follows")
+      .select("id")
+      .eq("follower_id", followerId)
+      .eq("following_id", followingId)
+      .maybeSingle();
+
+    if (checkError) {
+      throw checkError;
+    }
+
+    if (existingFollow) {
+      throw new Error("Already following this user");
+    }
+
+    // Create follow relationship
+    const { data, error } = await supabase
+      .from("follows")
+      .insert({
+        follower_id: followerId,
+        following_id: followingId,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error following user:", error);
+    throw new Error("Failed to follow user");
+  }
+};
+
+export const unfollowUser = async (followerId: string, followingId: string) => {
+  try {
+    const { error } = await supabase
+      .from("follows")
+      .delete()
+      .eq("follower_id", followerId)
+      .eq("following_id", followingId);
+
+    if (error) {
+      throw error;
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error unfollowing user:", error);
+    throw new Error("Failed to unfollow user");
+  }
+};
+
+export const checkIfFollowing = async (
+  followerId: string,
+  followingId: string
+) => {
+  try {
+    const { data, error } = await supabase
+      .from("follows")
+      .select("id")
+      .eq("follower_id", followerId)
+      .eq("following_id", followingId)
+      .maybeSingle();
+
+    if (error) {
+      throw error;
+    }
+
+    return !!data;
+  } catch (error) {
+    console.error("Error checking follow status:", error);
+    return false;
+  }
+};
+
+export const getFollowedUsers = async (userId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from("follows")
+      .select(
+        `
+        following_id,
+        following:profiles!follows_following_id_fkey (
+          id,
+          username,
+          full_name,
+          avatar_url
+        )
+      `
+      )
+      .eq("follower_id", userId);
+
+    if (error) {
+      throw error;
+    }
+
+    return data?.map((follow) => follow.following).flat() || [];
+  } catch (error) {
+    console.error("Error fetching followed users:", error);
+    throw new Error("Failed to fetch followed users");
+  }
+};
+
+export const getFollowingPosts = async (userId: string) => {
+  try {
+    // First get the list of users being followed
+    const { data: follows, error: followsError } = await supabase
+      .from("follows")
+      .select("following_id")
+      .eq("follower_id", userId);
+
+    if (followsError) {
+      throw followsError;
+    }
+
+    if (!follows || follows.length === 0) {
+      return [];
+    }
+
+    const followingIds = follows.map((follow) => follow.following_id);
+
+    // Get posts from all followed users
+    const { data, error } = await supabase.rpc("get_posts_with_details");
+
+    if (error) {
+      throw error;
+    }
+
+    // Filter posts by followed users
+    const followingPosts = data?.filter((post: { author: { id: string } }) =>
+      followingIds.includes(post.author.id)
+    );
+
+    return followingPosts || [];
+  } catch (error) {
+    console.error("Error fetching following posts:", error);
+    throw new Error("Failed to fetch following posts");
+  }
+};
+
+export const getFollowerCount = async (userId: string) => {
+  try {
+    const { count, error } = await supabase
+      .from("follows")
+      .select("*", { count: "exact", head: true })
+      .eq("following_id", userId);
+
+    if (error) {
+      throw error;
+    }
+
+    return count || 0;
+  } catch (error) {
+    console.error("Error getting follower count:", error);
+    return 0;
+  }
+};
+
+export const getFollowingCount = async (userId: string) => {
+  try {
+    const { count, error } = await supabase
+      .from("follows")
+      .select("*", { count: "exact", head: true })
+      .eq("follower_id", userId);
+
+    if (error) {
+      throw error;
+    }
+
+    return count || 0;
+  } catch (error) {
+    console.error("Error getting following count:", error);
+    return 0;
+  }
+};

@@ -17,6 +17,9 @@ import {
   useComments,
   useCreateComment,
   useToggleReaction,
+  useFollowingPosts,
+  useFollowerCount,
+  useFollowingCount,
 } from "../../lib/queries";
 import { Post, User as UserType } from "../../types";
 
@@ -24,7 +27,9 @@ const UserProfile: React.FC = () => {
   const { username } = useParams<{ username: string }>();
   const { user: currentUser } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<"posts" | "about">("posts");
+  const [activeTab, setActiveTab] = useState<"posts" | "following" | "about">(
+    "posts"
+  );
 
   // Query for user profile
   const {
@@ -61,6 +66,27 @@ const UserProfile: React.FC = () => {
   const toggleReactionMutation = useToggleReaction();
 
   const isOwnProfile = currentUser?.id === userProfile?.id;
+
+  // Query for following posts (only if it's the current user's profile and following tab is active)
+  const {
+    data: followingPosts,
+    isLoading: followingPostsLoading,
+    error: followingPostsError,
+  } = useFollowingPosts(
+    currentUser?.id || "",
+    isOwnProfile && activeTab === "following"
+  );
+
+  // Query for follower and following counts
+  const { data: followerCount = 0 } = useFollowerCount(userProfile?.id || "");
+  const { data: followingCount = 0 } = useFollowingCount(userProfile?.id || "");
+
+  // Query for comments for following posts
+  const followingPostIds = followingPosts?.map((post: Post) => post.id) || [];
+  const { data: followingComments } = useComments(
+    followingPostIds,
+    activeTab === "following"
+  );
 
   const handleReaction = (postId: string, type: "happy" | "sad") => {
     if (!currentUser) return;
@@ -245,7 +271,7 @@ const UserProfile: React.FC = () => {
                 <h3 className="text-lg font-semibold text-gray-100 mb-3">
                   Estadísticas
                 </h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <div className="text-center">
                     <div className="text-xl font-bold text-purple-400">
                       {userPosts?.length || 0}
@@ -253,8 +279,16 @@ const UserProfile: React.FC = () => {
                     <div className="text-sm text-gray-400">Posts</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-xl font-bold text-purple-400">0</div>
+                    <div className="text-xl font-bold text-purple-400">
+                      {followerCount}
+                    </div>
                     <div className="text-sm text-gray-400">Seguidores</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xl font-bold text-purple-400">
+                      {followingCount}
+                    </div>
+                    <div className="text-sm text-gray-400">Siguiendo</div>
                   </div>
                 </div>
               </div>
@@ -276,6 +310,18 @@ const UserProfile: React.FC = () => {
                 >
                   Posts ({userPosts?.length || 0})
                 </button>
+                {isOwnProfile && (
+                  <button
+                    onClick={() => setActiveTab("following")}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === "following"
+                        ? "border-purple-500 text-purple-400"
+                        : "border-transparent text-gray-400 hover:text-gray-300"
+                    }`}
+                  >
+                    Siguiendo ({followingPosts?.length || 0})
+                  </button>
+                )}
                 <button
                   onClick={() => setActiveTab("about")}
                   className={`py-2 px-1 border-b-2 font-medium text-sm ${
@@ -324,6 +370,44 @@ const UserProfile: React.FC = () => {
                       {isOwnProfile
                         ? "¡Comparte tu primera publicación con la comunidad!"
                         : "Este usuario aún no ha compartido ninguna publicación."}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === "following" && (
+              <div className="space-y-6">
+                {followingPostsLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+                  </div>
+                ) : followingPostsError ? (
+                  <div className="text-center py-8">
+                    <div className="text-red-400 mb-2">
+                      Error loading following posts
+                    </div>
+                    <p className="text-gray-500">Please try again later</p>
+                  </div>
+                ) : followingPosts && followingPosts.length > 0 ? (
+                  followingPosts.map((post: Post) => (
+                    <PostCard
+                      key={post.id}
+                      post={post}
+                      comments={followingComments || []}
+                      onReaction={handleReaction}
+                      onComment={handleComment}
+                      onUserClick={handleUserClick}
+                    />
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <User className="h-12 w-12 text-gray-500 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-400 mb-2">
+                      No sigues a nadie aún
+                    </h3>
+                    <p className="text-gray-500">
+                      Sigue a otros usuarios para ver sus posts aquí.
                     </p>
                   </div>
                 )}

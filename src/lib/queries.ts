@@ -12,6 +12,13 @@ import {
   createComment as createCommentAPI,
   getPostReactions,
   toggleReaction,
+  followUser,
+  unfollowUser,
+  checkIfFollowing,
+  getFollowedUsers,
+  getFollowingPosts,
+  getFollowerCount,
+  getFollowingCount,
 } from "./supabase";
 import { Post, Comment, User } from "../types";
 
@@ -21,6 +28,12 @@ export const queryKeys = {
   paginatedPosts: ["paginatedPosts"] as const,
   comments: (postIds: string[]) => ["comments", postIds] as const,
   userProfile: (userId: string) => ["profile", userId] as const,
+  followStatus: (followerId: string, followingId: string) =>
+    ["followStatus", followerId, followingId] as const,
+  followedUsers: (userId: string) => ["followedUsers", userId] as const,
+  followingPosts: (userId: string) => ["followingPosts", userId] as const,
+  followerCount: (userId: string) => ["followerCount", userId] as const,
+  followingCount: (userId: string) => ["followingCount", userId] as const,
 } as const;
 
 // Type definitions for API responses
@@ -424,6 +437,170 @@ export const useToggleReaction = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.posts });
       queryClient.invalidateQueries({ queryKey: queryKeys.paginatedPosts });
     },
+  });
+};
+
+// Follow status query hook
+export const useFollowStatus = (followerId?: string, followingId?: string) => {
+  return useQuery({
+    queryKey: queryKeys.followStatus(followerId || "", followingId || ""),
+    queryFn: () => checkIfFollowing(followerId!, followingId!),
+    enabled: !!followerId && !!followingId && followerId !== followingId,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+};
+
+// Follow user mutation hook
+export const useFollowUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      followerId,
+      followingId,
+    }: {
+      followerId: string;
+      followingId: string;
+    }) => {
+      return await followUser(followerId, followingId);
+    },
+    onSuccess: (_, { followerId, followingId }) => {
+      // Invalidate follow status
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.followStatus(followerId, followingId),
+      });
+      // Invalidate followed users list
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.followedUsers(followerId),
+      });
+      // Invalidate following posts
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.followingPosts(followerId),
+      });
+      // Invalidate counts
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.followerCount(followingId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.followingCount(followerId),
+      });
+    },
+    onError: (error: Error) => {
+      console.error("Failed to follow user:", error);
+    },
+  });
+};
+
+// Unfollow user mutation hook
+export const useUnfollowUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      followerId,
+      followingId,
+    }: {
+      followerId: string;
+      followingId: string;
+    }) => {
+      return await unfollowUser(followerId, followingId);
+    },
+    onSuccess: (_, { followerId, followingId }) => {
+      // Invalidate follow status
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.followStatus(followerId, followingId),
+      });
+      // Invalidate followed users list
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.followedUsers(followerId),
+      });
+      // Invalidate following posts
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.followingPosts(followerId),
+      });
+      // Invalidate counts
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.followerCount(followingId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.followingCount(followerId),
+      });
+    },
+    onError: (error: Error) => {
+      console.error("Failed to unfollow user:", error);
+    },
+  });
+};
+
+// Get followed users query hook
+export const useFollowedUsers = (userId: string) => {
+  return useQuery({
+    queryKey: queryKeys.followedUsers(userId),
+    queryFn: () => getFollowedUsers(userId),
+    enabled: !!userId,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+};
+
+// Get following posts query hook
+export const useFollowingPosts = (userId: string, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: queryKeys.followingPosts(userId),
+    queryFn: async (): Promise<Post[]> => {
+      const fetchedPosts = await getFollowingPosts(userId);
+
+      if (!fetchedPosts || fetchedPosts.length === 0) {
+        return [];
+      }
+
+      // Get post IDs for fetching reactions
+      const postIds = (fetchedPosts as PostDetails[]).map((post) => post.id);
+
+      // Fetch reactions for all posts
+      const reactions = await getPostReactions(postIds);
+
+      const formattedPosts: Post[] = (fetchedPosts as PostDetails[]).map(
+        (post) => ({
+          id: post.id,
+          content: post.content,
+          image: post.image_url ?? undefined,
+          createdAt: new Date(post.created_at),
+          author: {
+            id: post.author.id,
+            username: post.author.username,
+            full_name: post.author.full_name ?? undefined,
+            avatar_url: post.author.avatar_url ?? undefined,
+          },
+          topics: post.topics,
+          commentsCount: post.comments_count,
+          reactions: reactions[post.id] || { happy: [], sad: [] },
+        })
+      );
+
+      return formattedPosts;
+    },
+    enabled: !!userId && enabled,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+};
+
+// Get follower count query hook
+export const useFollowerCount = (userId: string) => {
+  return useQuery({
+    queryKey: queryKeys.followerCount(userId),
+    queryFn: () => getFollowerCount(userId),
+    enabled: !!userId,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+};
+
+// Get following count query hook
+export const useFollowingCount = (userId: string) => {
+  return useQuery({
+    queryKey: queryKeys.followingCount(userId),
+    queryFn: () => getFollowingCount(userId),
+    enabled: !!userId,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };
 
