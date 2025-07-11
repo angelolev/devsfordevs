@@ -1,69 +1,43 @@
-# React + TypeScript + Vite
+# DevsForDevs
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este repositorio contiene el código fuente de **DevsForDevs**, una plataforma social diseñada específicamente para desarrolladores de software.
 
-Currently, two official plugins are available:
+## Propósito
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+El objetivo principal de **DevsForDevs** es crear un espacio centralizado donde los desarrolladores puedan:
 
-## Expanding the ESLint configuration
+- **Compartir Conocimiento:** Publicar artículos, tutoriales y fragmentos de código.
+- **Colaborar:** Encontrar compañeros para proyectos personales o de código abierto.
+- **Discutir:** Participar en conversaciones sobre las últimas tecnologías, herramientas y tendencias de la industria.
+- **Crear Comunidad:** Conectar con otros profesionales del sector en un entorno enfocado en el desarrollo.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Stack Tecnológico
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Este proyecto está construido con un stack moderno para asegurar una experiencia de desarrollo fluida y escalable:
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+- **Frontend:** [React](https://react.dev/) con [TypeScript](https://www.typescriptlang.org/) y [Vite](https://vitejs.dev/)
+- **Backend & Base de Datos:** [Supabase](https://supabase.io/)
+- **Gestor de Paquetes:** [pnpm](https://pnpm.io/)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Empezando
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Para levantar un entorno de desarrollo local, sigue estos pasos:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1.  **Clonar el repositorio:**
+    ```bash
+    git clone https://github.com/tu-usuario/devsfordevs.git
+    cd devsfordevs
+    ```
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+2.  **Instalar dependencias:**
+    ```bash
+    pnpm install
+    ```
+
+3.  **Configurar variables de entorno:**
+    Crea un archivo `.env` en la raíz del proyecto y añade las claves de tu proyecto de Supabase.
+
+4.  **Ejecutar el servidor de desarrollo:**
+    ```bash
+    pnpm dev
+    ```
