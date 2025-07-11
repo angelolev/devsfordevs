@@ -68,7 +68,10 @@ const Feed: React.FC = () => {
   };
 
   const handleReaction = (postId: string, type: "happy" | "sad") => {
-    if (!user) return;
+    if (!user) {
+      alert("Inicia sesión para reaccionar a los posts");
+      return;
+    }
 
     toggleReactionMutation.mutate({
       postId,
@@ -82,7 +85,10 @@ const Feed: React.FC = () => {
     content: string,
     parentId?: string
   ) => {
-    if (!user) return;
+    if (!user) {
+      alert("Inicia sesión para comentar en los posts");
+      return;
+    }
 
     try {
       await createCommentMutation.mutateAsync({
@@ -130,11 +136,6 @@ const Feed: React.FC = () => {
     );
   }
 
-  if (!user) {
-    navigate("/");
-    return null;
-  }
-
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-7xl mx-auto">
@@ -172,7 +173,16 @@ const Feed: React.FC = () => {
         <div className="flex gap-8 justify-between">
           {/* Main Content */}
           <div className="flex-1 max-w-full lg:max-w-2xl">
-            <CreatePost onCreatePost={handleCreatePost} />
+            {user ? (
+              <CreatePost onCreatePost={handleCreatePost} />
+            ) : (
+              <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <p className="text-blue-700 dark:text-blue-300 text-sm text-center">
+                  <span className="font-medium">¡Únete a la conversación!</span>{" "}
+                  Inicia sesión para crear posts, comentar y reaccionar.
+                </p>
+              </div>
+            )}
 
             {isLoading && (
               <div className="text-center py-12">

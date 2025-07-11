@@ -60,10 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-        // Set authLoading to false immediately so components can proceed
-        setAuthLoading(false);
-
-        // Handle profile upsert asynchronously without blocking
+        // Handle profile upsert and only set authLoading to false after completion
         const handleProfileUpsert = async () => {
           try {
             const authUser = session.user;
@@ -101,6 +98,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             console.error("Error in profile upsert:", error);
             setUser(null);
             localStorage.removeItem("user");
+          } finally {
+            // Only set authLoading to false after profile is loaded (or failed)
+            setAuthLoading(false);
           }
         };
 
@@ -121,8 +121,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         } catch (error) {
           console.error("Error in USER_UPDATED handler:", error);
+        } finally {
+          setAuthLoading(false);
         }
-        setAuthLoading(false);
       } else {
         // For any other events, just mark as not loading
         setAuthLoading(false);

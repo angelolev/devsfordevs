@@ -111,7 +111,7 @@ const UserProfile: React.FC = () => {
           </p>
           <button
             onClick={() => navigate("/feed")}
-            className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Volver al Feed
@@ -125,16 +125,26 @@ const UserProfile: React.FC = () => {
     userProfile.full_name || userProfile.username || "Usuario";
   const joinDate = new Date(userProfile.created_at || Date.now());
 
+  // Generar colores aleatorios
+  const randomColor1 = "#" + Math.floor(Math.random() * 16777215).toString(16);
+  const randomColor2 = "#" + Math.floor(Math.random() * 16777215).toString(16);
+  const randomColor3 = "#" + Math.floor(Math.random() * 16777215).toString(16);
+
   return (
     <div className="min-h-screen bg-[#1a1a1a]">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-600 via-blue-800 to-green-600 relative">
+      <div
+        className="relative"
+        style={{
+          background: `linear-gradient(90deg, ${randomColor1} 0%, ${randomColor2} 50%, ${randomColor3} 100%)`,
+        }}
+      >
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
           <div className="py-8">
             <button
               onClick={() => navigate(-1)}
-              className="inline-flex items-center text-white/80 hover:text-white mb-6 transition-colors"
+              className="inline-flex items-center text-white/80 hover:text-white mb-6 transition-colors cursor-pointer"
             >
               <ArrowLeft className="h-5 w-5 mr-2" />
               Volver
@@ -184,7 +194,7 @@ const UserProfile: React.FC = () => {
 
                   {/* Action Buttons */}
                   {isOwnProfile && (
-                    <button className="inline-flex items-center px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors">
+                    <button className="inline-flex items-center px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors cursor-pointer">
                       <Edit3 className="h-4 w-4 mr-2" />
                       Editar Perfil
                     </button>

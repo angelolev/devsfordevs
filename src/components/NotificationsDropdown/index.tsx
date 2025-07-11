@@ -49,53 +49,53 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
     {
       id: "1",
       type: "new_post",
-      title: "New post from @reactguru",
-      message: "@reactguru shared a new post about React hooks",
+      title: "Nuevo post de @reactguru",
+      message: "@reactguru compartió un nuevo post sobre React hooks",
       relatedPostId: "2",
       relatedUserId: "2",
       relatedUsername: "reactguru",
       relatedUserAvatar:
         "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100",
       isRead: false,
-      createdAt: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
+      createdAt: new Date(Date.now() - 30 * 60 * 1000), // hace 30 minutos
     },
     {
       id: "2",
       type: "follow",
-      title: "New follower",
-      message: "@pythonista started following you",
+      title: "Nuevo seguidor",
+      message: "@pythonista comenzó a seguirte",
       relatedUserId: "3",
       relatedUsername: "pythonista",
       relatedUserAvatar:
         "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100",
       isRead: false,
-      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // hace 2 horas
     },
     {
       id: "3",
       type: "comment",
-      title: "New comment on your post",
-      message: "@reactguru commented on your TypeScript post",
+      title: "Nuevo comentario en tu post",
+      message: "@reactguru comentó en tu post de TypeScript",
       relatedPostId: "1",
       relatedUserId: "2",
       relatedUsername: "reactguru",
       relatedUserAvatar:
         "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100",
       isRead: true,
-      createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+      createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // hace 1 día
     },
     {
       id: "4",
       type: "mention",
-      title: "You were mentioned",
-      message: "@pythonista mentioned you in a comment",
+      title: "Te mencionaron",
+      message: "@pythonista te mencionó en un comentario",
       relatedPostId: "3",
       relatedUserId: "3",
       relatedUsername: "pythonista",
       relatedUserAvatar:
         "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100",
       isRead: true,
-      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // hace 3 días
     },
   ];
 
@@ -246,7 +246,7 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
                 className="flex items-center space-x-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 cursor-pointer"
               >
                 <CheckCheck className="h-4 w-4" />
-                <span>Mark all read</span>
+                <span>Marcar todas como leídas</span>
               </button>
             )}
           </div>
@@ -261,10 +261,11 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
                 <button
                   key={notification.id}
                   onClick={() => handleNotificationClick(notification)}
-                  className={`w-full text-left p-3 rounded-lg transition-colors duration-200 ${notification.isRead
+                  className={`w-full text-left p-3 rounded-lg transition-colors duration-200 ${
+                    notification.isRead
                       ? "bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600"
                       : "bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 border border-blue-200 dark:border-blue-800"
-                    } cursor-pointer`}
+                  } cursor-pointer`}
                 >
                   <div className="flex items-start space-x-3">
                     <div className="flex-shrink-0 mt-1">
@@ -311,7 +312,7 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
             <div className="text-center py-8">
               <Bell className="h-12 w-12 mx-auto mb-3 text-gray-400" />
               <p className="text-gray-500 dark:text-gray-400">
-                No notifications yet
+                No hay notificaciones
               </p>
             </div>
           )}
@@ -341,7 +342,7 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-600">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Notifications
+              Notificaciones
             </h3>
             <div className="flex items-center space-x-2">
               {unreadCount > 0 && (
@@ -350,7 +351,7 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
                   className="flex items-center space-x-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 cursor-pointer"
                 >
                   <CheckCheck className="h-4 w-4" />
-                  <span>Mark all read</span>
+                  <span>Marcar todas como leídas</span>
                 </button>
               )}
               <button
@@ -374,10 +375,11 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
                   <button
                     key={notification.id}
                     onClick={() => handleNotificationClick(notification)}
-                    className={`w-full text-left p-4 transition-colors duration-200 ${notification.isRead
+                    className={`w-full text-left p-4 transition-colors duration-200 ${
+                      notification.isRead
                         ? "hover:bg-gray-50 dark:hover:bg-gray-700"
                         : "bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30"
-                      } cursor-pointer`}
+                    } cursor-pointer`}
                   >
                     <div className="flex items-start space-x-3">
                       <div className="flex-shrink-0 mt-1">
@@ -424,10 +426,11 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
               <div className="text-center py-8">
                 <Bell className="h-12 w-12 mx-auto mb-3 text-gray-400" />
                 <p className="text-gray-500 dark:text-gray-400">
-                  No notifications yet
+                  No hay notificaciones
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  Follow other developers to get notified of their posts
+                  Sigue a otros desarrolladores para recibir notificaciones de
+                  sus posts
                 </p>
               </div>
             )}
