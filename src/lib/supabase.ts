@@ -556,3 +556,130 @@ export const getFollowingCount = async (userId: string) => {
     return 0;
   }
 };
+
+// Notification functions
+export const getUserNotifications = async (
+  userId: string,
+  limit: number = 20,
+  offset: number = 0
+) => {
+  try {
+    const { data, error } = await supabase.rpc("get_user_notifications", {
+      user_id: userId,
+      limit_count: limit,
+      offset_count: offset,
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error("Error fetching user notifications:", error);
+    throw new Error("Failed to fetch notifications");
+  }
+};
+
+export const getUnreadNotificationCount = async (userId: string) => {
+  try {
+    const { data, error } = await supabase.rpc(
+      "get_unread_notification_count",
+      {
+        user_id: userId,
+      }
+    );
+
+    if (error) {
+      throw error;
+    }
+
+    return data || 0;
+  } catch (error) {
+    console.error("Error fetching unread notification count:", error);
+    return 0;
+  }
+};
+
+export const markNotificationsAsRead = async (notificationIds: string[]) => {
+  try {
+    const { data, error } = await supabase.rpc("mark_notifications_as_read", {
+      notification_ids: notificationIds,
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    return data || 0;
+  } catch (error) {
+    console.error("Error marking notifications as read:", error);
+    throw new Error("Failed to mark notifications as read");
+  }
+};
+
+export const createFollowNotification = async (
+  followerId: string,
+  followingId: string
+) => {
+  try {
+    const { data, error } = await supabase.rpc("create_follow_notification", {
+      follower_id: followerId,
+      following_id: followingId,
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error creating follow notification:", error);
+    // Don't throw error to avoid breaking the follow action
+    return null;
+  }
+};
+
+export const createCommentNotification = async (
+  commenterId: string,
+  postId: string,
+  commentId: string
+) => {
+  try {
+    const { data, error } = await supabase.rpc("create_comment_notification", {
+      commenter_id: commenterId,
+      post_id: postId,
+      comment_id: commentId,
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error creating comment notification:", error);
+    // Don't throw error to avoid breaking the comment action
+    return null;
+  }
+};
+
+// Subscribe to real-time notifications
+export const subscribeToNotifications = (
+  userId: string,
+  callback: (payload: { new: object; old: object; eventType: string }) => void
+) => {
+  return supabase
+    .channel("notifications")
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "notifications",
+        filter: `recipient_id=eq.${userId}`,
+      },
+      callback
+    )
+    .subscribe();
+};

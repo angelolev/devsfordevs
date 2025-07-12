@@ -10,19 +10,15 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import {
+  useUserNotifications,
+  useUnreadNotificationCount,
+  useMarkNotificationsAsRead,
+  useNotificationSubscription,
+  type Notification,
+} from "../../lib/queries";
 
-interface Notification {
-  id: string;
-  type: "new_post" | "mention" | "follow" | "comment";
-  title: string;
-  message: string;
-  relatedPostId?: string;
-  relatedUserId?: string;
-  relatedUsername?: string;
-  relatedUserAvatar?: string;
-  isRead: boolean;
-  createdAt: Date;
-}
+// Remove local interface - using imported one from queries.ts
 
 interface NotificationsDropdownProps {
   unreadCount: number;
@@ -32,79 +28,40 @@ interface NotificationsDropdownProps {
 }
 
 const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
-  unreadCount,
   onUnreadCountChange,
   isMobile = false,
   onClose,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Mock notifications data - replace with real API calls
-  const mockNotifications: Notification[] = [
-    {
-      id: "1",
-      type: "new_post",
-      title: "Nuevo post de @reactguru",
-      message: "@reactguru compartió un nuevo post sobre React hooks",
-      relatedPostId: "2",
-      relatedUserId: "2",
-      relatedUsername: "reactguru",
-      relatedUserAvatar:
-        "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100",
-      isRead: false,
-      createdAt: new Date(Date.now() - 30 * 60 * 1000), // hace 30 minutos
-    },
-    {
-      id: "2",
-      type: "follow",
-      title: "Nuevo seguidor",
-      message: "@pythonista comenzó a seguirte",
-      relatedUserId: "3",
-      relatedUsername: "pythonista",
-      relatedUserAvatar:
-        "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100",
-      isRead: false,
-      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // hace 2 horas
-    },
-    {
-      id: "3",
-      type: "comment",
-      title: "Nuevo comentario en tu post",
-      message: "@reactguru comentó en tu post de TypeScript",
-      relatedPostId: "1",
-      relatedUserId: "2",
-      relatedUsername: "reactguru",
-      relatedUserAvatar:
-        "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=100",
-      isRead: true,
-      createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // hace 1 día
-    },
-    {
-      id: "4",
-      type: "mention",
-      title: "Te mencionaron",
-      message: "@pythonista te mencionó en un comentario",
-      relatedPostId: "3",
-      relatedUserId: "3",
-      relatedUsername: "pythonista",
-      relatedUserAvatar:
-        "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100",
-      isRead: true,
-      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // hace 3 días
-    },
-  ];
+  // React Query hooks for notifications
+  const { data: notifications = [], isLoading } = useUserNotifications(
+    user?.id || "",
+    !!user
+  );
+  const { data: realUnreadCount = 0 } = useUnreadNotificationCount(
+    user?.id || "",
+    !!user
+  );
+  const markAsReadMutation = useMarkNotificationsAsRead();
 
-  useEffect(() => {
-    if (isOpen) {
-      loadNotifications();
+  // Real-time notification subscription
+  useNotificationSubscription(user?.id || "", () => {
+    // Update the unread count when a new notification comes in
+    if (onUnreadCountChange) {
+      onUnreadCountChange(realUnreadCount + 1);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
+  });
+
+  // Update parent component with real unread count
+  useEffect(() => {
+    if (onUnreadCountChange) {
+      onUnreadCountChange(realUnreadCount);
+    }
+  }, [realUnreadCount, onUnreadCountChange]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -124,19 +81,6 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
     }
   }, [isOpen, isMobile]);
 
-  const loadNotifications = async () => {
-    setIsLoading(true);
-    try {
-      // In production, this would be a real API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setNotifications(mockNotifications);
-    } catch (error) {
-      console.error("Error loading notifications:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleToggleDropdown = () => {
     if (isMobile && onClose) {
       // For mobile, this is handled by the parent menu
@@ -147,20 +91,18 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
 
   const handleNotificationClick = (notification: Notification) => {
     // Mark as read if unread
-    if (!notification.isRead) {
-      markAsRead([notification.id]);
+    if (!notification.is_read) {
+      markAsReadMutation.mutate([notification.id]);
     }
 
     // Navigate based on notification type
-    if (notification.type === "follow" && notification.relatedUsername) {
-      navigate(`/user/${notification.relatedUsername}`);
+    if (notification.type === "follow" && notification.actor_username) {
+      navigate(`/user/${notification.actor_username}`);
     } else if (
-      (notification.type === "new_post" ||
-        notification.type === "comment" ||
-        notification.type === "mention") &&
-      notification.relatedPostId
+      (notification.type === "comment" || notification.type === "mention") &&
+      notification.related_post_id
     ) {
-      navigate(`/?post=${notification.relatedPostId}`);
+      navigate(`/?post=${notification.related_post_id}`);
     }
 
     setIsOpen(false);
@@ -169,38 +111,15 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
     }
   };
 
-  const markAsRead = async (notificationIds: string[]) => {
-    try {
-      // Update local state immediately
-      setNotifications((prev) =>
-        prev.map((notif) =>
-          notificationIds.includes(notif.id)
-            ? { ...notif, isRead: true }
-            : notif
-        )
-      );
-
-      // Update unread count
-      const newUnreadCount = notifications.filter(
-        (n) => !n.isRead && !notificationIds.includes(n.id)
-      ).length;
-      onUnreadCountChange(newUnreadCount);
-
-      // In production, make API call to mark as read
-      console.log("Marking notifications as read:", notificationIds);
-    } catch (error) {
-      console.error("Error marking notifications as read:", error);
-    }
-  };
-
   const markAllAsRead = async () => {
-    const unreadIds = notifications.filter((n) => !n.isRead).map((n) => n.id);
+    const unreadIds = notifications.filter((n) => !n.is_read).map((n) => n.id);
     if (unreadIds.length > 0) {
-      await markAsRead(unreadIds);
+      markAsReadMutation.mutate(unreadIds);
     }
   };
 
-  const formatTimeAgo = (date: Date) => {
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const minutes = Math.floor(diff / 60000);
@@ -216,12 +135,10 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case "new_post":
+      case "comment":
         return <MessageCircle className="h-4 w-4 text-blue-500" />;
       case "follow":
         return <User className="h-4 w-4 text-green-500" />;
-      case "comment":
-        return <MessageCircle className="h-4 w-4 text-purple-500" />;
       case "mention":
         return <Heart className="h-4 w-4 text-red-500" />;
       default:
@@ -240,7 +157,7 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
               Notifications
             </h3>
-            {unreadCount > 0 && (
+            {realUnreadCount > 0 && (
               <button
                 onClick={markAllAsRead}
                 className="flex items-center space-x-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 cursor-pointer"
@@ -262,17 +179,17 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
                   key={notification.id}
                   onClick={() => handleNotificationClick(notification)}
                   className={`w-full text-left p-3 rounded-lg transition-colors duration-200 ${
-                    notification.isRead
+                    notification.is_read
                       ? "bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600"
                       : "bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 border border-blue-200 dark:border-blue-800"
                   } cursor-pointer`}
                 >
                   <div className="flex items-start space-x-3">
                     <div className="flex-shrink-0 mt-1">
-                      {notification.relatedUserAvatar ? (
+                      {notification.actor_avatar_url ? (
                         <img
-                          src={notification.relatedUserAvatar}
-                          alt={notification.relatedUsername}
+                          src={notification.actor_avatar_url}
+                          alt={notification.actor_username}
                           className="w-8 h-8 rounded-full object-cover"
                         />
                       ) : (
@@ -284,7 +201,7 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
                     <div className="flex-1 min-w-0">
                       <p
                         className={`text-sm font-medium ${
-                          notification.isRead
+                          notification.is_read
                             ? "text-gray-900 dark:text-gray-100"
                             : "text-gray-900 dark:text-white"
                         }`}
@@ -297,9 +214,9 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
                       <div className="flex items-center space-x-2 mt-2">
                         <Calendar className="h-3 w-3 text-gray-400" />
                         <span className="text-xs text-gray-400">
-                          {formatTimeAgo(notification.createdAt)}
+                          {formatTimeAgo(notification.created_at)}
                         </span>
-                        {!notification.isRead && (
+                        {!notification.is_read && (
                           <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                         )}
                       </div>
@@ -330,9 +247,9 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
         aria-label="Notifications"
       >
         <Bell className="h-5 w-5 text-gray-900" />
-        {unreadCount > 0 && (
+        {realUnreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-            {unreadCount > 9 ? "9+" : unreadCount}
+            {realUnreadCount > 9 ? "9+" : realUnreadCount}
           </span>
         )}
       </button>
@@ -345,7 +262,7 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
               Notificaciones
             </h3>
             <div className="flex items-center space-x-2">
-              {/* {unreadCount > 0 && (
+              {realUnreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
                   className="flex items-center space-x-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 cursor-pointer"
@@ -353,7 +270,7 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
                   <CheckCheck className="h-4 w-4" />
                   <span>Marcar todas como leídas</span>
                 </button>
-              )} */}
+              )}
               <button
                 onClick={() => setIsOpen(false)}
                 className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"
@@ -376,17 +293,17 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
                     key={notification.id}
                     onClick={() => handleNotificationClick(notification)}
                     className={`w-full text-left p-4 transition-colors duration-200 ${
-                      notification.isRead
+                      notification.is_read
                         ? "hover:bg-gray-50 dark:hover:bg-gray-700"
                         : "bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30"
                     } cursor-pointer`}
                   >
                     <div className="flex items-start space-x-3">
                       <div className="flex-shrink-0 mt-1">
-                        {notification.relatedUserAvatar ? (
+                        {notification.actor_avatar_url ? (
                           <img
-                            src={notification.relatedUserAvatar}
-                            alt={notification.relatedUsername}
+                            src={notification.actor_avatar_url}
+                            alt={notification.actor_username}
                             className="w-10 h-10 rounded-full object-cover"
                           />
                         ) : (
@@ -398,7 +315,7 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
                       <div className="flex-1 min-w-0">
                         <p
                           className={`text-sm font-medium ${
-                            notification.isRead
+                            notification.is_read
                               ? "text-gray-900 dark:text-gray-100"
                               : "text-gray-900 dark:text-white"
                           }`}
@@ -411,9 +328,9 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
                         <div className="flex items-center space-x-2 mt-2">
                           <Calendar className="h-3 w-3 text-gray-400" />
                           <span className="text-xs text-gray-400">
-                            {formatTimeAgo(notification.createdAt)}
+                            {formatTimeAgo(notification.created_at)}
                           </span>
-                          {!notification.isRead && (
+                          {!notification.is_read && (
                             <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                           )}
                         </div>

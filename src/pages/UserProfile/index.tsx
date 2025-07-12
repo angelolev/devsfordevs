@@ -15,7 +15,7 @@ import { PostCard } from "../../components";
 import { getUserProfile, getUserPosts } from "../../lib/supabase";
 import {
   useComments,
-  useCreateComment,
+  useCreateCommentWithNotification,
   useToggleReaction,
   useFollowingPosts,
   useFollowerCount,
@@ -91,7 +91,7 @@ const UserProfile: React.FC = () => {
   );
 
   // Mutations
-  const createCommentMutation = useCreateComment();
+  const createCommentMutation = useCreateCommentWithNotification();
   const toggleReactionMutation = useToggleReaction();
 
   // Query for follower and following counts

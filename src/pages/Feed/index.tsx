@@ -9,7 +9,7 @@ import {
   usePaginatedPosts,
   useComments,
   useCreatePost,
-  useCreateComment,
+  useCreateCommentWithNotification,
   useToggleReaction,
 } from "../../lib/queries";
 
@@ -43,7 +43,7 @@ const Feed: React.FC = () => {
   } = useComments(postIds, !authLoading && posts.length > 0);
 
   const createPostMutation = useCreatePost();
-  const createCommentMutation = useCreateComment();
+  const createCommentMutation = useCreateCommentWithNotification();
   const toggleReactionMutation = useToggleReaction();
 
   // Combine loading states

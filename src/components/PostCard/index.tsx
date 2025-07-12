@@ -11,7 +11,7 @@ import { Post as PostType, Comment, AVAILABLE_TOPICS, User } from "../../types";
 import { useAuth } from "../../contexts/AuthContext";
 import {
   useFollowStatus,
-  useFollowUser,
+  useFollowUserWithNotification,
   useUnfollowUser,
 } from "../../lib/queries";
 import CommentSection from "../CommentsSection";
@@ -40,7 +40,7 @@ const Post: React.FC<PostProps> = ({
 
   // Follow status and mutations
   const { data: isFollowing } = useFollowStatus(user?.id, post.author.id);
-  const followUserMutation = useFollowUser();
+  const followUserMutation = useFollowUserWithNotification();
   const unfollowUserMutation = useUnfollowUser();
 
   const formatDate = (date: Date) => {

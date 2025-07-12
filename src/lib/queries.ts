@@ -1,3 +1,4 @@
+import React from "react";
 import {
   useQuery,
   useMutation,
@@ -19,6 +20,12 @@ import {
   getFollowingPosts,
   getFollowerCount,
   getFollowingCount,
+  getUserNotifications,
+  getUnreadNotificationCount,
+  markNotificationsAsRead,
+  createFollowNotification,
+  createCommentNotification,
+  subscribeToNotifications,
 } from "./supabase";
 import { Post, Comment, User } from "../types";
 
@@ -34,6 +41,9 @@ export const queryKeys = {
   followingPosts: (userId: string) => ["followingPosts", userId] as const,
   followerCount: (userId: string) => ["followerCount", userId] as const,
   followingCount: (userId: string) => ["followingCount", userId] as const,
+  notifications: (userId: string) => ["notifications", userId] as const,
+  unreadNotificationCount: (userId: string) =>
+    ["unreadNotificationCount", userId] as const,
 } as const;
 
 // Type definitions for API responses
@@ -613,4 +623,215 @@ export const prefetchPosts = (
     queryFn: getPosts,
     staleTime: 1000 * 60 * 5,
   });
+};
+
+// Notification interface
+export interface Notification {
+  id: string;
+  type: "follow" | "comment" | "mention" | "post_reaction";
+  title: string;
+  message: string;
+  is_read: boolean;
+  related_post_id?: string;
+  related_comment_id?: string;
+  created_at: string;
+  actor_id: string;
+  actor_username?: string;
+  actor_full_name?: string;
+  actor_avatar_url?: string;
+}
+
+// Get user notifications query hook
+export const useUserNotifications = (
+  userId: string,
+  enabled: boolean = true
+) => {
+  return useQuery({
+    queryKey: queryKeys.notifications(userId),
+    queryFn: async (): Promise<Notification[]> => {
+      const notifications = await getUserNotifications(userId);
+      return notifications || [];
+    },
+    enabled: !!userId && enabled,
+    staleTime: 1000 * 60 * 2, // 2 minutes
+  });
+};
+
+// Get unread notification count query hook
+export const useUnreadNotificationCount = (
+  userId: string,
+  enabled: boolean = true
+) => {
+  return useQuery({
+    queryKey: queryKeys.unreadNotificationCount(userId),
+    queryFn: () => getUnreadNotificationCount(userId),
+    enabled: !!userId && enabled,
+    staleTime: 1000 * 60 * 1, // 1 minute
+    refetchInterval: 1000 * 60 * 2, // Poll every 2 minutes
+  });
+};
+
+// Mark notifications as read mutation hook
+export const useMarkNotificationsAsRead = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (notificationIds: string[]) => {
+      return await markNotificationsAsRead(notificationIds);
+    },
+    onSuccess: () => {
+      // Update notification queries
+      queryClient.invalidateQueries({
+        queryKey: ["notifications"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["unreadNotificationCount"],
+      });
+    },
+    onError: (error: Error) => {
+      console.error("Failed to mark notifications as read:", error);
+    },
+  });
+};
+
+// Enhanced follow user mutation hook with notification
+export const useFollowUserWithNotification = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      followerId,
+      followingId,
+    }: {
+      followerId: string;
+      followingId: string;
+    }) => {
+      // Follow user
+      const followResult = await followUser(followerId, followingId);
+
+      // Create notification
+      await createFollowNotification(followerId, followingId);
+
+      return followResult;
+    },
+    onSuccess: (_, { followerId, followingId }) => {
+      // Invalidate follow status
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.followStatus(followerId, followingId),
+      });
+      // Invalidate followed users list
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.followedUsers(followerId),
+      });
+      // Invalidate following posts
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.followingPosts(followerId),
+      });
+      // Invalidate counts
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.followerCount(followingId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.followingCount(followerId),
+      });
+      // Invalidate notifications for the followed user
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.notifications(followingId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.unreadNotificationCount(followingId),
+      });
+    },
+    onError: (error: Error) => {
+      console.error("Failed to follow user:", error);
+    },
+  });
+};
+
+// Enhanced create comment mutation hook with notification
+export const useCreateCommentWithNotification = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      postId,
+      authorId,
+      content,
+      parentId,
+    }: {
+      postId: string;
+      authorId: string;
+      content: string;
+      parentId?: string;
+    }) => {
+      // Create comment
+      const commentResult = await createCommentAPI({
+        post_id: postId,
+        author_id: authorId,
+        content,
+        parent_id: parentId,
+      });
+
+      // Create notification
+      if (commentResult?.id) {
+        await createCommentNotification(authorId, postId, commentResult.id);
+      }
+
+      return commentResult;
+    },
+    onSuccess: () => {
+      // Invalidate comments for the post
+      queryClient.invalidateQueries({
+        queryKey: ["comments"],
+      });
+      // Invalidate post data to update comment count
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.posts,
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.paginatedPosts,
+      });
+      // Invalidate notifications (we don't know the post author here, so invalidate all)
+      queryClient.invalidateQueries({
+        queryKey: ["notifications"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["unreadNotificationCount"],
+      });
+    },
+    onError: (error: Error) => {
+      console.error("Failed to create comment:", error);
+    },
+  });
+};
+
+// Real-time notifications subscription hook
+export const useNotificationSubscription = (
+  userId: string,
+  onNotification: (notification: Notification) => void
+) => {
+  const queryClient = useQueryClient();
+
+  React.useEffect(() => {
+    if (!userId) return;
+
+    const subscription = subscribeToNotifications(userId, (payload) => {
+      const newNotification = payload.new as Notification;
+
+      // Call the callback
+      onNotification(newNotification);
+
+      // Invalidate notification queries
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.notifications(userId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.unreadNotificationCount(userId),
+      });
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [userId, onNotification, queryClient]);
 };
