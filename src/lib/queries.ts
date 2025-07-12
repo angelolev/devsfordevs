@@ -566,11 +566,11 @@ export const useUnfollowUser = () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.followingPosts(followerId),
       });
-      // Invalidate counts
-      queryClient.invalidateQueries({
+      // Refetch counts immediately to update UI
+      queryClient.refetchQueries({
         queryKey: queryKeys.followerCount(followingId),
       });
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({
         queryKey: queryKeys.followingCount(followerId),
       });
     },
@@ -765,11 +765,11 @@ export const useFollowUserWithNotification = () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.followingPosts(followerId),
       });
-      // Invalidate counts
-      queryClient.invalidateQueries({
+      // Refetch counts immediately to update UI
+      queryClient.refetchQueries({
         queryKey: queryKeys.followerCount(followingId),
       });
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({
         queryKey: queryKeys.followingCount(followerId),
       });
       // Invalidate notifications for the followed user

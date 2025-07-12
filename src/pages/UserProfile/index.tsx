@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -46,15 +46,27 @@ const UserProfile: React.FC = () => {
     "posts"
   );
 
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Memoize random colors to prevent regeneration on every render
-  const headerColors = useMemo(
-    () => ({
-      color1: "#" + Math.floor(Math.random() * 16777215).toString(16),
-      color2: "#" + Math.floor(Math.random() * 16777215).toString(16),
-      color3: "#" + Math.floor(Math.random() * 16777215).toString(16),
-    }),
-    []
-  );
+  const headerColors = useMemo(() => {
+    const generateRandomColor = () => {
+      // Generate a random color with good saturation and brightness
+      const hue = Math.floor(Math.random() * 360);
+      const saturation = 70 + Math.floor(Math.random() * 30); // 70-100%
+      const lightness = 45 + Math.floor(Math.random() * 20); // 45-65%
+      return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    };
+
+    return {
+      color1: generateRandomColor(),
+      color2: generateRandomColor(),
+      color3: generateRandomColor(),
+    };
+  }, []);
 
   // Query for user profile
   const {
