@@ -174,9 +174,9 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
     return (
       <div className="border-t border-gray-200 dark:border-gray-600">
         <div className="px-4 py-3">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex flex-col items-center gap-2 justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Notifications
+              Notificaciones
             </h3>
             {realUnreadCount > 0 && (
               <button

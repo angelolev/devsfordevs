@@ -143,7 +143,7 @@ const Feed: React.FC = () => {
   }
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-16">
+    <div className="px-4  py-6 sm:px-6 lg:px-8 md:py-16">
       <div className="max-w-7xl mx-auto">
         {/* Mobile Filter Button */}
         <div className="lg:hidden mb-6">
