@@ -36,9 +36,9 @@ const CommentItem: React.FC<CommentItemProps> = ({
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
 
-    if (minutes < 1) return "Just now";
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
+    if (minutes < 1) return "Hace instantes";
+    if (minutes < 60) return `Hace ${minutes}m`;
+    if (hours < 24) return `Hace ${hours}h`;
     return date.toLocaleDateString();
   };
 
@@ -281,7 +281,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
 
       {!user && organizedComments.length === 0 && (
         <p className="text-center text-gray-500 dark:text-gray-400 text-sm py-4">
-          No comments yet. Sign in to be the first to comment!
+          No hay comentarios aún. Inicia sesión para ser el primero en comentar!
         </p>
       )}
     </div>
