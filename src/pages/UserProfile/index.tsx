@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -31,6 +31,16 @@ const UserProfile: React.FC = () => {
     "posts"
   );
 
+  // Memoize random colors to prevent regeneration on every render
+  const headerColors = useMemo(
+    () => ({
+      color1: "#" + Math.floor(Math.random() * 16777215).toString(16),
+      color2: "#" + Math.floor(Math.random() * 16777215).toString(16),
+      color3: "#" + Math.floor(Math.random() * 16777215).toString(16),
+    }),
+    []
+  );
+
   // Query for user profile
   const {
     data: userProfile,
@@ -45,7 +55,9 @@ const UserProfile: React.FC = () => {
     enabled: !!username,
   });
 
-  // Query for user posts
+  const isOwnProfile = currentUser?.id === userProfile?.id;
+
+  // Query for user posts - always enabled when we have userProfile
   const {
     data: userPosts,
     isLoading: postsLoading,
@@ -54,20 +66,10 @@ const UserProfile: React.FC = () => {
     queryKey: ["userPosts", userProfile?.id],
     queryFn: () =>
       userProfile?.id ? getUserPosts(userProfile.id) : Promise.resolve([]),
-    enabled: !!userProfile?.id && activeTab === "posts",
+    enabled: !!userProfile?.id,
   });
 
-  // Query for comments (for all user posts)
-  const postIds = userPosts?.map((post: Post) => post.id) || [];
-  const { data: comments } = useComments(postIds, activeTab === "posts");
-
-  // Mutations
-  const createCommentMutation = useCreateComment();
-  const toggleReactionMutation = useToggleReaction();
-
-  const isOwnProfile = currentUser?.id === userProfile?.id;
-
-  // Query for following posts (only if it's the current user's profile and following tab is active)
+  // Query for following posts - only load when on following tab
   const {
     data: followingPosts,
     isLoading: followingPostsLoading,
@@ -77,16 +79,24 @@ const UserProfile: React.FC = () => {
     isOwnProfile && activeTab === "following"
   );
 
-  // Query for follower and following counts
-  const { data: followerCount = 0 } = useFollowerCount(userProfile?.id || "");
-  const { data: followingCount = 0 } = useFollowingCount(userProfile?.id || "");
+  // Query for comments (for all user posts) - always enabled when we have posts
+  const postIds = userPosts?.map((post: Post) => post.id) || [];
+  const { data: comments } = useComments(postIds, postIds.length > 0);
 
-  // Query for comments for following posts
+  // Query for comments for following posts - only load when on following tab
   const followingPostIds = followingPosts?.map((post: Post) => post.id) || [];
   const { data: followingComments } = useComments(
     followingPostIds,
-    activeTab === "following"
+    activeTab === "following" && followingPostIds.length > 0
   );
+
+  // Mutations
+  const createCommentMutation = useCreateComment();
+  const toggleReactionMutation = useToggleReaction();
+
+  // Query for follower and following counts
+  const { data: followerCount = 0 } = useFollowerCount(userProfile?.id || "");
+  const { data: followingCount = 0 } = useFollowingCount(userProfile?.id || "");
 
   const handleReaction = (postId: string, type: "happy" | "sad") => {
     if (!currentUser) return;
@@ -151,10 +161,130 @@ const UserProfile: React.FC = () => {
     userProfile.full_name || userProfile.username || "Usuario";
   const joinDate = new Date(userProfile.created_at || Date.now());
 
-  // Generar colores aleatorios
-  const randomColor1 = "#" + Math.floor(Math.random() * 16777215).toString(16);
-  const randomColor2 = "#" + Math.floor(Math.random() * 16777215).toString(16);
-  const randomColor3 = "#" + Math.floor(Math.random() * 16777215).toString(16);
+  // Function to render tab content without loading states for already loaded data
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "posts":
+        if (postsLoading) {
+          return (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+            </div>
+          );
+        }
+
+        if (postsError) {
+          return (
+            <div className="text-center py-8">
+              <div className="text-red-400 mb-2">Error loading posts</div>
+              <p className="text-gray-500">Please try again later</p>
+            </div>
+          );
+        }
+
+        if (userPosts && userPosts.length > 0) {
+          return userPosts.map((post: Post) => (
+            <PostCard
+              key={post.id}
+              post={post}
+              comments={comments || []}
+              onReaction={handleReaction}
+              onComment={handleComment}
+              onUserClick={handleUserClick}
+            />
+          ));
+        }
+
+        return (
+          <div className="text-center py-8">
+            <User className="h-12 w-12 text-gray-500 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-400 mb-2">
+              {isOwnProfile ? "No has publicado nada aún" : "No hay posts aún"}
+            </h3>
+            <p className="text-gray-500">
+              {isOwnProfile
+                ? "¡Comparte tu primera publicación con la comunidad!"
+                : "Este usuario aún no ha compartido ninguna publicación."}
+            </p>
+          </div>
+        );
+
+      case "following":
+        if (!isOwnProfile) {
+          return (
+            <div className="text-center py-8">
+              <User className="h-12 w-12 text-gray-500 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-400 mb-2">
+                Contenido privado
+              </h3>
+              <p className="text-gray-500">
+                Solo puedes ver tus propios posts seguidos.
+              </p>
+            </div>
+          );
+        }
+
+        if (followingPostsLoading) {
+          return (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+            </div>
+          );
+        }
+
+        if (followingPostsError) {
+          return (
+            <div className="text-center py-8">
+              <div className="text-red-400 mb-2">
+                Error loading following posts
+              </div>
+              <p className="text-gray-500">Please try again later</p>
+            </div>
+          );
+        }
+
+        if (followingPosts && followingPosts.length > 0) {
+          return followingPosts.map((post: Post) => (
+            <PostCard
+              key={post.id}
+              post={post}
+              comments={followingComments || []}
+              onReaction={handleReaction}
+              onComment={handleComment}
+              onUserClick={handleUserClick}
+            />
+          ));
+        }
+
+        return (
+          <div className="text-center py-8">
+            <User className="h-12 w-12 text-gray-500 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-400 mb-2">
+              No sigues a nadie aún
+            </h3>
+            <p className="text-gray-500">
+              Sigue a otros usuarios para ver sus posts aquí.
+            </p>
+          </div>
+        );
+
+      case "about":
+        return (
+          <div className="bg-gray-800 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-gray-100 mb-4">
+              Actividad Reciente
+            </h3>
+            <div className="text-center py-8">
+              <Settings className="h-12 w-12 text-gray-500 mx-auto mb-4" />
+              <p className="text-gray-500">Funcionalidad en desarrollo</p>
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#1a1a1a]">
@@ -162,7 +292,7 @@ const UserProfile: React.FC = () => {
       <div
         className="relative"
         style={{
-          background: `linear-gradient(90deg, ${randomColor1} 0%, ${randomColor2} 50%, ${randomColor3} 100%)`,
+          background: `linear-gradient(90deg, ${headerColors.color1} 0%, ${headerColors.color2} 50%, ${headerColors.color3} 100%)`,
         }}
       >
         <div className="absolute inset-0 bg-black/20"></div>
@@ -302,7 +432,7 @@ const UserProfile: React.FC = () => {
               <nav className="flex space-x-8">
                 <button
                   onClick={() => setActiveTab("posts")}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  className={`py-2 px-1 border-b-2 font-medium text-sm cursor-pointer transition-colors ${
                     activeTab === "posts"
                       ? "border-purple-500 text-purple-400"
                       : "border-transparent text-gray-400 hover:text-gray-300"
@@ -313,7 +443,7 @@ const UserProfile: React.FC = () => {
                 {isOwnProfile && (
                   <button
                     onClick={() => setActiveTab("following")}
-                    className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                    className={`py-2 px-1 border-b-2 font-medium text-sm cursor-pointer transition-colors ${
                       activeTab === "following"
                         ? "border-purple-500 text-purple-400"
                         : "border-transparent text-gray-400 hover:text-gray-300"
@@ -324,7 +454,7 @@ const UserProfile: React.FC = () => {
                 )}
                 <button
                   onClick={() => setActiveTab("about")}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  className={`py-2 px-1 border-b-2 font-medium text-sm cursor-pointer transition-colors ${
                     activeTab === "about"
                       ? "border-purple-500 text-purple-400"
                       : "border-transparent text-gray-400 hover:text-gray-300"
@@ -336,97 +466,7 @@ const UserProfile: React.FC = () => {
             </div>
 
             {/* Tab Content */}
-            {activeTab === "posts" && (
-              <div className="space-y-6">
-                {postsLoading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
-                  </div>
-                ) : postsError ? (
-                  <div className="text-center py-8">
-                    <div className="text-red-400 mb-2">Error loading posts</div>
-                    <p className="text-gray-500">Please try again later</p>
-                  </div>
-                ) : userPosts && userPosts.length > 0 ? (
-                  userPosts.map((post: Post) => (
-                    <PostCard
-                      key={post.id}
-                      post={post}
-                      comments={comments || []}
-                      onReaction={handleReaction}
-                      onComment={handleComment}
-                      onUserClick={handleUserClick}
-                    />
-                  ))
-                ) : (
-                  <div className="text-center py-8">
-                    <User className="h-12 w-12 text-gray-500 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-400 mb-2">
-                      {isOwnProfile
-                        ? "No has publicado nada aún"
-                        : "No hay posts aún"}
-                    </h3>
-                    <p className="text-gray-500">
-                      {isOwnProfile
-                        ? "¡Comparte tu primera publicación con la comunidad!"
-                        : "Este usuario aún no ha compartido ninguna publicación."}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {activeTab === "following" && (
-              <div className="space-y-6">
-                {followingPostsLoading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
-                  </div>
-                ) : followingPostsError ? (
-                  <div className="text-center py-8">
-                    <div className="text-red-400 mb-2">
-                      Error loading following posts
-                    </div>
-                    <p className="text-gray-500">Please try again later</p>
-                  </div>
-                ) : followingPosts && followingPosts.length > 0 ? (
-                  followingPosts.map((post: Post) => (
-                    <PostCard
-                      key={post.id}
-                      post={post}
-                      comments={followingComments || []}
-                      onReaction={handleReaction}
-                      onComment={handleComment}
-                      onUserClick={handleUserClick}
-                    />
-                  ))
-                ) : (
-                  <div className="text-center py-8">
-                    <User className="h-12 w-12 text-gray-500 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-400 mb-2">
-                      No sigues a nadie aún
-                    </h3>
-                    <p className="text-gray-500">
-                      Sigue a otros usuarios para ver sus posts aquí.
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {activeTab === "about" && (
-              <div className="space-y-6">
-                <div className="bg-gray-800 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-gray-100 mb-4">
-                    Actividad Reciente
-                  </h3>
-                  <div className="text-center py-8">
-                    <Settings className="h-12 w-12 text-gray-500 mx-auto mb-4" />
-                    <p className="text-gray-500">Funcionalidad en desarrollo</p>
-                  </div>
-                </div>
-              </div>
-            )}
+            <div className="space-y-6">{renderTabContent()}</div>
           </div>
         </div>
       </div>

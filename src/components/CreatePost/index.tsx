@@ -124,7 +124,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
             placeholder="<>¿Qué tienes para decir hoy?</>"
             className="input text-sm md:text-base w-full resize-none transition-all duration-200 px-3 py-2 border rounded-lg bg-white border-[#d1d5db] text-[#111827]  dark:bg-[#1a1a1a] dark:border-[#4b5563] dark:text-[#f9fafb]"
             rows={isExpanded ? 3 : 2}
-            maxLength={280}
+            maxLength={250}
             disabled={isUploading}
           />
 
@@ -154,7 +154,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
                     : "text-gray-500 dark:text-gray-400"
                 }`}
               >
-                {content.length}/280
+                {content.length}/250
               </span>
             </div>
           )}

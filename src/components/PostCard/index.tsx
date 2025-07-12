@@ -103,17 +103,12 @@ const Post: React.FC<PostProps> = ({
       y: e.clientY + 10, // Offset slightly below cursor
     });
     setShowUserPopup(true);
-    setIsPopupLocked(false);
+    setIsPopupLocked(true); // Lock immediately so popup stays fixed
 
     // Clear any existing timer
     if (popupTimerRef.current) {
       clearTimeout(popupTimerRef.current);
     }
-
-    // Lock the popup position after 500ms
-    popupTimerRef.current = setTimeout(() => {
-      setIsPopupLocked(true);
-    }, 500);
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -352,10 +347,10 @@ const Post: React.FC<PostProps> = ({
                 disabled={
                   followUserMutation.isPending || unfollowUserMutation.isPending
                 }
-                className={`mt-3 w-full px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center justify-center space-x-2 ${
+                className={`mt-3 w-full px-4 py-2 cursor-pointer rounded-lg text-sm font-medium transition-colors duration-200 flex items-center justify-center space-x-2 ${
                   isFollowing
-                    ? "bg-gray-600 hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600 text-white"
-                    : "bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white"
+                    ? "bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white"
+                    : "bg-[#7158e2]  text-white"
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 {followUserMutation.isPending ||
@@ -366,7 +361,7 @@ const Post: React.FC<PostProps> = ({
                 ) : (
                   <UserPlus className="h-4 w-4" />
                 )}
-                <span>{isFollowing ? "Siguiendo" : "Seguir"}</span>
+                <span>{isFollowing ? "Dejar de seguir" : "Seguir"}</span>
               </button>
             )}
           </div>

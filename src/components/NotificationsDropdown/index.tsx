@@ -340,12 +340,12 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
       {isOpen && (
         <div className="absolute right-0 top-full mt-2 w-96 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 animate-fade-in z-50">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-600">
+          <div className="flex gap-4 items-center justify-between p-4 border-b border-gray-200 dark:border-gray-600">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
               Notificaciones
             </h3>
             <div className="flex items-center space-x-2">
-              {unreadCount > 0 && (
+              {/* {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
                   className="flex items-center space-x-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 cursor-pointer"
@@ -353,7 +353,7 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
                   <CheckCheck className="h-4 w-4" />
                   <span>Marcar todas como leídas</span>
                 </button>
-              )}
+              )} */}
               <button
                 onClick={() => setIsOpen(false)}
                 className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"
