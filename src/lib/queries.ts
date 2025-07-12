@@ -8,6 +8,7 @@ import {
 import {
   getPosts,
   getPostsPaginated,
+  getPostById,
   getCommentsForPosts,
   createPost as createPostAPI,
   createComment as createCommentAPI,
@@ -33,6 +34,7 @@ import { Post, Comment, User } from "../types";
 export const queryKeys = {
   posts: ["posts"] as const,
   paginatedPosts: ["paginatedPosts"] as const,
+  postDetail: (postId: string) => ["postDetail", postId] as const,
   comments: (postIds: string[]) => ["comments", postIds] as const,
   userProfile: (userId: string) => ["profile", userId] as const,
   followStatus: (followerId: string, followingId: string) =>
@@ -166,6 +168,42 @@ export const usePaginatedPosts = () => {
       return allPages.length * 20;
     },
     initialPageParam: 0,
+    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    refetchOnMount: false, // Don't refetch on component mount if data exists
+  });
+};
+
+// Custom hook for fetching a single post by ID
+export const usePostDetail = (postId: string, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: queryKeys.postDetail(postId),
+    queryFn: async (): Promise<Post> => {
+      const fetchedPost = await getPostById(postId);
+
+      // Get reactions for the post
+      const reactions = await getPostReactions([postId]);
+
+      const formattedPost: Post = {
+        id: fetchedPost.id,
+        content: fetchedPost.content,
+        image: fetchedPost.image ?? undefined,
+        createdAt: fetchedPost.createdAt,
+        author: {
+          id: fetchedPost.author.id,
+          username: fetchedPost.author.username,
+          full_name: fetchedPost.author.full_name ?? undefined,
+          avatar_url: fetchedPost.author.avatar_url ?? undefined,
+        },
+        topics: fetchedPost.topics,
+        commentsCount: fetchedPost.commentsCount,
+        reactions: reactions[postId] || { happy: [], sad: [] },
+      };
+
+      return formattedPost;
+    },
+    enabled: enabled && !!postId,
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
     gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
     refetchOnWindowFocus: false, // Don't refetch when window regains focus

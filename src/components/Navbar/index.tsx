@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
-  Code,
   LogIn,
   User,
   LogOut,
@@ -11,6 +10,7 @@ import {
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import NotificationsDropdown from "../NotificationsDropdown";
+import Logo from "../Logo";
 
 interface NavbarProps {
   onAuthModal: (type: "login") => void;
@@ -76,7 +76,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
             onClick={() => navigate("/feed")}
             className="flex items-center space-x-2 flex-shrink-0 hover:opacity-80 transition-opacity duration-200"
           >
-            <Code className="h-6 w-6 sm:h-8 sm:w-8 text-gray-900" />
+            <Logo className="h-6 w-6 sm:h-8 sm:w-8" color="#29c940" />
             <span className="text-lg sm:text-xl font-bold text-gray-900">
               Devs4Devs
             </span>

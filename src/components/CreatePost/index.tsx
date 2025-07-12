@@ -198,7 +198,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onCreatePost }) => {
             <div>
               <div className="flex items-center space-x-2 mb-3">
                 <Tag className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                <span className="text-sm font-semibold text-gray-500 dark:text-gray-300">
+                <span className="text-sm md:text-lg font-semibold text-gray-500 dark:text-gray-300">
                   Elige temas ({selectedTopics.length})
                 </span>
               </div>

@@ -326,6 +326,21 @@ export const getUserProfile = async (username: string) => {
   return data;
 };
 
+export const getUserProfileById = async (userId: string) => {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", userId)
+    .single();
+
+  if (error) {
+    console.error("Error fetching user profile by ID:", error);
+    throw new Error(error.message);
+  }
+
+  return data;
+};
+
 export const getUserPosts = async (userId: string) => {
   const { data, error } = await supabase.rpc("get_posts_with_details");
 
@@ -372,6 +387,39 @@ export const getUserPosts = async (userId: string) => {
       })
     ) || []
   );
+};
+
+export const getPostById = async (postId: string) => {
+  const { data, error } = await supabase.rpc("get_posts_with_details");
+
+  if (error) {
+    console.error("Error fetching post by ID:", error);
+    throw new Error(error.message);
+  }
+
+  // Find the specific post by ID
+  const post = data?.find((post: { id: string }) => post.id === postId);
+
+  if (!post) {
+    throw new Error("Post not found");
+  }
+
+  // Transform the data to match the Post interface
+  return {
+    id: post.id,
+    content: post.content,
+    image: post.image_url ?? undefined,
+    createdAt: new Date(post.created_at), // Convert string to Date object
+    author: {
+      id: post.author.id,
+      username: post.author.username,
+      full_name: post.author.full_name ?? undefined,
+      avatar_url: post.author.avatar_url ?? undefined,
+    },
+    topics: post.topics || [],
+    commentsCount: post.comments_count || 0,
+    reactions: { happy: [], sad: [] }, // We'll need to fetch reactions separately if needed
+  };
 };
 
 // Follow functions

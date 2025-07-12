@@ -6,6 +6,7 @@ import {
   Tag,
   UserPlus,
   UserCheck,
+  ExternalLink,
 } from "lucide-react";
 import { Post as PostType, Comment, AVAILABLE_TOPICS, User } from "../../types";
 import { useAuth } from "../../contexts/AuthContext";
@@ -22,6 +23,7 @@ interface PostProps {
   onReaction: (postId: string, type: "happy" | "sad") => void;
   onComment: (postId: string, content: string, parentId?: string) => void;
   onUserClick?: (user: User) => void;
+  hideOpenButton?: boolean;
 }
 
 const Post: React.FC<PostProps> = ({
@@ -30,6 +32,7 @@ const Post: React.FC<PostProps> = ({
   onReaction,
   onComment,
   onUserClick,
+  hideOpenButton = false,
 }) => {
   const [showComments, setShowComments] = useState(false);
   const [showUserPopup, setShowUserPopup] = useState(false);
@@ -95,6 +98,11 @@ const Post: React.FC<PostProps> = ({
         followingId: post.author.id,
       });
     }
+  };
+
+  const handleOpenPostDetail = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    window.open(`/post/${post.id}`, "_blank");
   };
 
   const handleMouseEnter = (e: React.MouseEvent) => {
@@ -292,6 +300,16 @@ const Post: React.FC<PostProps> = ({
             </span>
           </span>
         </button>
+
+        {!hideOpenButton && (
+          <button
+            onClick={handleOpenPostDetail}
+            className="flex items-center text-base text-[#565f89] hover:text-[#bb9af7] transition-colors duration-200 cursor-pointer ml-auto"
+            title="Abrir en nueva pestaña"
+          >
+            <ExternalLink className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
       {showComments && (

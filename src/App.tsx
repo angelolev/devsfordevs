@@ -2,6 +2,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import Feed from "./pages/Feed";
 import UserProfile from "./pages/UserProfile";
+import PostDetail from "./pages/PostDetail";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { AuthModal, Navbar } from "./components";
@@ -28,7 +29,9 @@ const AppContent: React.FC = () => {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/feed" element={<Feed />} />
+          <Route path="/post/:postId" element={<PostDetail />} />
           <Route path="/user/:username" element={<UserProfile />} />
+          <Route path="/profile/:userId" element={<UserProfile />} />
           {/* <Route path="/admin" element={<AdminDashboard />} /> */}
           {/* <Route path="/auth/callback" element={<AuthCallback />} /> */}
         </Routes>

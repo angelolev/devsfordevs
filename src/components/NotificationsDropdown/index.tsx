@@ -96,13 +96,34 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
     }
 
     // Navigate based on notification type
-    if (notification.type === "follow" && notification.actor_username) {
-      navigate(`/user/${notification.actor_username}`);
+    if (notification.type === "follow") {
+      // For follow notifications, navigate to the follower's profile
+      if (notification.actor_username) {
+        console.log(
+          "Navigating to follower profile:",
+          notification.actor_username
+        );
+        navigate(`/user/${notification.actor_username}`);
+      } else if (notification.actor_id) {
+        // Fallback: if no username, navigate by user ID
+        console.log(
+          "No username found, navigating by user ID:",
+          notification.actor_id
+        );
+        navigate(`/profile/${notification.actor_id}`);
+      } else {
+        // Last resort: show helpful message
+        console.log(
+          "No username or user ID found for notification:",
+          notification
+        );
+        alert("No se pudo encontrar el perfil del usuario.");
+      }
     } else if (
       (notification.type === "comment" || notification.type === "mention") &&
       notification.related_post_id
     ) {
-      navigate(`/?post=${notification.related_post_id}`);
+      navigate(`/post/${notification.related_post_id}`);
     }
 
     setIsOpen(false);

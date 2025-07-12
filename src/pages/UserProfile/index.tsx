@@ -12,7 +12,11 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { PostCard } from "../../components";
-import { getUserProfile, getUserPosts } from "../../lib/supabase";
+import {
+  getUserProfile,
+  getUserProfileById,
+  getUserPosts,
+} from "../../lib/supabase";
 import {
   useComments,
   useCreateCommentWithNotification,
@@ -24,9 +28,15 @@ import {
 import { Post, User as UserType } from "../../types";
 
 const UserProfile: React.FC = () => {
-  const { username } = useParams<{ username: string }>();
+  const { username, userId } = useParams<{
+    username?: string;
+    userId?: string;
+  }>();
   const { user: currentUser } = useAuth();
   const navigate = useNavigate();
+
+  // Use either username or userId for the profile query
+  const profileParam = username || userId;
   const [activeTab, setActiveTab] = useState<"posts" | "following" | "about">(
     "posts"
   );
@@ -47,12 +57,25 @@ const UserProfile: React.FC = () => {
     isLoading: profileLoading,
     error: profileError,
   } = useQuery({
-    queryKey: ["userProfile", username],
-    queryFn: () =>
-      username
-        ? getUserProfile(username)
-        : Promise.reject(new Error("No username")),
-    enabled: !!username,
+    queryKey: ["userProfile", profileParam],
+    queryFn: async () => {
+      if (!profileParam) {
+        throw new Error("No profile parameter provided");
+      }
+
+      // Check if profileParam is a UUID (for direct user ID links)
+      const isUUID =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+          profileParam
+        );
+
+      if (isUUID || userId) {
+        return getUserProfileById(profileParam);
+      } else {
+        return getUserProfile(profileParam);
+      }
+    },
+    enabled: !!profileParam,
   });
 
   const isOwnProfile = currentUser?.id === userProfile?.id;
