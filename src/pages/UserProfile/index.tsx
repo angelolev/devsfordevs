@@ -9,6 +9,8 @@ import {
   Mail,
   ArrowLeft,
   Settings,
+  UserPlus,
+  UserCheck,
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { PostCard } from "../../components";
@@ -24,6 +26,9 @@ import {
   useFollowingPosts,
   useFollowerCount,
   useFollowingCount,
+  useFollowStatus,
+  useFollowUserWithNotification,
+  useUnfollowUser,
 } from "../../lib/queries";
 import { Post, User as UserType } from "../../types";
 
@@ -79,6 +84,14 @@ const UserProfile: React.FC = () => {
   });
 
   const isOwnProfile = currentUser?.id === userProfile?.id;
+
+  // Follow status and mutations
+  const { data: isFollowing } = useFollowStatus(
+    currentUser?.id,
+    userProfile?.id
+  );
+  const followUserMutation = useFollowUserWithNotification();
+  const unfollowUserMutation = useUnfollowUser();
 
   // Query for user posts - always enabled when we have userProfile
   const {
@@ -147,6 +160,24 @@ const UserProfile: React.FC = () => {
   const handleUserClick = (user: UserType) => {
     if (user.username && user.username !== userProfile?.username) {
       navigate(`/user/${user.username}`);
+    }
+  };
+
+  const handleFollowClick = () => {
+    if (!currentUser || !userProfile) {
+      return;
+    }
+
+    if (isFollowing) {
+      unfollowUserMutation.mutate({
+        followerId: currentUser.id,
+        followingId: userProfile.id,
+      });
+    } else {
+      followUserMutation.mutate({
+        followerId: currentUser.id,
+        followingId: userProfile.id,
+      });
     }
   };
 
@@ -372,12 +403,39 @@ const UserProfile: React.FC = () => {
                   </div>
 
                   {/* Action Buttons */}
-                  {isOwnProfile && (
-                    <button className="inline-flex items-center px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors cursor-pointer">
-                      <Edit3 className="h-4 w-4 mr-2" />
-                      Editar Perfil
-                    </button>
-                  )}
+                  <div className="flex items-center space-x-3">
+                    {isOwnProfile ? (
+                      <button className="inline-flex items-center px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors cursor-pointer">
+                        <Edit3 className="h-4 w-4 mr-2" />
+                        Editar Perfil
+                      </button>
+                    ) : (
+                      currentUser && (
+                        <button
+                          onClick={handleFollowClick}
+                          disabled={
+                            followUserMutation.isPending ||
+                            unfollowUserMutation.isPending
+                          }
+                          className={`inline-flex items-center px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+                            isFollowing
+                              ? "bg-red-600 hover:bg-red-700 text-white"
+                              : "bg-purple-600 hover:bg-purple-700 text-white"
+                          }`}
+                        >
+                          {followUserMutation.isPending ||
+                          unfollowUserMutation.isPending ? (
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                          ) : isFollowing ? (
+                            <UserCheck className="h-4 w-4 mr-2" />
+                          ) : (
+                            <UserPlus className="h-4 w-4 mr-2" />
+                          )}
+                          {isFollowing ? "Dejar de seguir" : "Seguir"}
+                        </button>
+                      )
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
