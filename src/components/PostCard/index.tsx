@@ -162,7 +162,7 @@ const Post: React.FC<PostProps> = ({
           <span className="w-3 h-3 bg-[#28c940] rounded-full"></span>
         </div>
         <div className="text-xs md:text-base text-[#c0caf5]">
-          {post.author.username}@devs4devs — zsh
+          {post.author.username}@fakingdevs — zsh
         </div>
         <div></div>
       </div>

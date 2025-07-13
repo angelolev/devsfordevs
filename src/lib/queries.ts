@@ -372,6 +372,9 @@ export const useToggleReaction = () => {
       // Cancel any outgoing refetches to avoid overwriting optimistic update
       await queryClient.cancelQueries({ queryKey: queryKeys.posts });
       await queryClient.cancelQueries({ queryKey: queryKeys.paginatedPosts });
+      await queryClient.cancelQueries({
+        queryKey: queryKeys.postDetail(postId),
+      });
 
       // Snapshot the previous value
       const previousPosts = queryClient.getQueryData<Post[]>(queryKeys.posts);
@@ -379,6 +382,9 @@ export const useToggleReaction = () => {
         pages: Post[][];
         pageParams: number[];
       }>(queryKeys.paginatedPosts);
+      const previousPostDetail = queryClient.getQueryData<Post>(
+        queryKeys.postDetail(postId)
+      );
 
       // Optimistically update the cache
       if (previousPosts) {
@@ -464,10 +470,45 @@ export const useToggleReaction = () => {
         );
       }
 
+      // Optimistically update the post detail cache
+      if (previousPostDetail) {
+        const oppositeType = reactionType === "happy" ? "sad" : "happy";
+        const hasCurrentReaction =
+          previousPostDetail.reactions[reactionType].includes(userId);
+        const hasOppositeReaction =
+          previousPostDetail.reactions[oppositeType].includes(userId);
+
+        const newReactions = { ...previousPostDetail.reactions };
+
+        if (hasCurrentReaction) {
+          // Remove current reaction
+          newReactions[reactionType] = newReactions[reactionType].filter(
+            (id) => id !== userId
+          );
+        } else {
+          // Add current reaction and remove opposite if exists
+          newReactions[reactionType] = [...newReactions[reactionType], userId];
+          if (hasOppositeReaction) {
+            newReactions[oppositeType] = newReactions[oppositeType].filter(
+              (id) => id !== userId
+            );
+          }
+        }
+
+        const updatedPostDetail = {
+          ...previousPostDetail,
+          reactions: newReactions,
+        };
+        queryClient.setQueryData(
+          queryKeys.postDetail(postId),
+          updatedPostDetail
+        );
+      }
+
       // Return a context object with the snapshot for rollback
-      return { previousPosts, previousPaginatedPosts };
+      return { previousPosts, previousPaginatedPosts, previousPostDetail };
     },
-    onError: (err, _variables, context) => {
+    onError: (err, variables, context) => {
       // If the mutation fails, rollback to the previous state
       if (context?.previousPosts) {
         queryClient.setQueryData(queryKeys.posts, context.previousPosts);
@@ -478,12 +519,21 @@ export const useToggleReaction = () => {
           context.previousPaginatedPosts
         );
       }
+      if (context?.previousPostDetail) {
+        queryClient.setQueryData(
+          queryKeys.postDetail(variables.postId),
+          context.previousPostDetail
+        );
+      }
       console.error("Failed to toggle reaction:", err);
     },
-    onSettled: () => {
+    onSettled: (_data, _error, variables) => {
       // Always refetch after success or error to ensure we have the correct state
       queryClient.invalidateQueries({ queryKey: queryKeys.posts });
       queryClient.invalidateQueries({ queryKey: queryKeys.paginatedPosts });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.postDetail(variables.postId),
+      });
     },
   });
 };

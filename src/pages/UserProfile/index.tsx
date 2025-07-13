@@ -212,11 +212,11 @@ const UserProfile: React.FC = () => {
             El perfil que buscas no existe o ha sido eliminado.
           </p>
           <button
-            onClick={() => navigate("/feed")}
+            onClick={() => navigate("/")}
             className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Volver al Feed
+            Volver al Inicio
           </button>
         </div>
       </div>

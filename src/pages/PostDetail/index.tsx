@@ -302,7 +302,7 @@ const PostDetail: React.FC = () => {
   };
 
   const handleBackClick = () => {
-    navigate("/feed");
+    navigate("/");
   };
 
   // Loading state
@@ -330,7 +330,7 @@ const PostDetail: React.FC = () => {
             className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Volver al Feed
+            Volver al Inicio
           </button>
         </div>
       </div>
@@ -356,14 +356,14 @@ const PostDetail: React.FC = () => {
         }}
       >
         <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
           <div className="py-8">
             <button
               onClick={handleBackClick}
               className="inline-flex items-center text-white/80 hover:text-white mb-6 transition-colors cursor-pointer"
             >
               <ArrowLeft className="h-5 w-5 mr-2" />
-              Volver al Feed
+              Volver al Inicio
             </button>
 
             <div className="flex flex-col sm:flex-row sm:items-end sm:space-x-6">
@@ -438,7 +438,7 @@ const PostDetail: React.FC = () => {
       </div>
 
       {/* Post Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">

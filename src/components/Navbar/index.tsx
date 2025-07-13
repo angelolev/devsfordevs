@@ -73,12 +73,12 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthModal }) => {
         <div className="flex justify-between items-center h-16">
           {/* Logo Section */}
           <button
-            onClick={() => navigate("/feed")}
+            onClick={() => navigate("/")}
             className="flex items-center space-x-2 flex-shrink-0 hover:opacity-80 transition-opacity duration-200"
           >
             <Logo className="h-6 w-6 sm:h-8 sm:w-8" color="#29c940" />
             <span className="text-lg sm:text-xl font-bold text-gray-900">
-              Devs4Devs
+              FakingDevs
             </span>
           </button>
 

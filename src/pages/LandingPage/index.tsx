@@ -43,7 +43,7 @@ const LandingPage: React.FC = () => {
         </div>
         <div className="mt-8 text-center">
           <Link
-            to="/feed"
+            to="/"
             className="bg-green-500 hover:bg-green-600 text-black font-bold py-2 px-4 rounded transition-colors duration-200"
           >
             Entrar a Dev4Devs

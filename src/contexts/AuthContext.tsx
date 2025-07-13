@@ -165,11 +165,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: {
-          redirectTo: `${
-            import.meta.env.VITE_APP_BASE_URL || window.location.origin
-          }/feed`,
-        },
       });
       if (error) throw error;
     } catch (error) {
@@ -184,11 +179,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "github",
-        options: {
-          redirectTo: `${
-            import.meta.env.VITE_APP_BASE_URL || window.location.origin
-          }/feed`,
-        },
       });
       if (error) throw error;
     } catch (error) {
