@@ -296,7 +296,11 @@ const Post: React.FC<PostProps> = ({
           <span>
             {post.commentsCount}{" "}
             <span className="hidden md:inline">
-              comentario{post.commentsCount > 1 ? "s" : ""}
+              {post.commentsCount === 0
+                ? "comentarios"
+                : post.commentsCount === 1
+                ? "comentarios"
+                : "comentarios"}
             </span>
           </span>
         </button>
