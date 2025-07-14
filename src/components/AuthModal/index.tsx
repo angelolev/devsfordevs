@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Github } from "lucide-react";
+// import { Github } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 
 interface AuthModalProps {
@@ -32,7 +32,7 @@ const GoogleIcon = () => (
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const {
     signInWithGoogle,
-    signInWithGitHub,
+    // signInWithGitHub,
     isLoading,
     isMissingUsername,
     updateProfile,
@@ -117,15 +117,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-md"
         >
           <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white mb-4">
-            Welcome to DevsForDevs!
+            Bienvenido(a) a FakingDevs!
           </h2>
           <p className="text-center text-gray-600 dark:text-gray-300 mb-6">
-            Choose a unique username to complete your profile.
+            Elige un nombre de usuario único para completar tu perfil.
           </p>
           <div className="flex flex-col gap-4">
             <input
               type="text"
-              placeholder="Enter your username"
+              placeholder="Ingresa tu nombre de usuario"
               value={username}
               onChange={handleUsernameChange}
               maxLength={12}
@@ -134,7 +134,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             {username.length >= 3 &&
               (username.match(/[a-zA-Z]/g) || []).length < 3 && (
                 <p className="text-yellow-500 text-sm -mt-2">
-                  Username must contain at least 3 letters.
+                  El nombre de usuario debe contener al menos 3 letras.
                 </p>
               )}
             {error && <p className="text-red-500 text-sm -mt-2">{error}</p>}
@@ -147,7 +147,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               }
               className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-blue-400 flex items-center justify-center cursor-pointer"
             >
-              {isLoading ? "Saving..." : "Save and Continue"}
+              {isLoading ? "Guardando..." : "Guardar y Continuar"}
             </button>
           </div>
         </div>
@@ -163,7 +163,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-            Log in to DevsForDevs
+            Inicia sesión en FakingDevs
           </h2>
           <button
             onClick={onClose}
@@ -173,7 +173,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           </button>
         </div>
         <p className="text-center text-gray-600 dark:text-gray-300 mb-6">
-          Connect with developers and share your knowledge.
+          Conecta con desarrolladores y comparte tu conocimiento.
         </p>
         <div className="flex flex-col gap-4">
           <button
@@ -182,16 +182,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             className="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 disabled:bg-red-400 flex items-center justify-center cursor-pointer"
           >
             <GoogleIcon />
-            Continue with Google
+            Continuar con Google
           </button>
-          <button
+          {/* <button
             onClick={signInWithGitHub}
             disabled={isLoading}
             className="w-full bg-gray-900 text-white py-2 px-4 rounded-md hover:bg-black disabled:bg-gray-700 flex items-center justify-center cursor-pointer"
           >
             <Github className="w-5 h-5 mr-2" />
-            Continue with GitHub
-          </button>
+            Continuar con GitHub
+          </button> */}
         </div>
       </div>
     </div>

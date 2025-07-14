@@ -1,10 +1,10 @@
-# DevsForDevs
+# FakingDevs
 
-Este repositorio contiene el código fuente de **DevsForDevs**, una plataforma social diseñada específicamente para desarrolladores de software.
+Este repositorio contiene el código fuente de **FakingDevs**, una plataforma social diseñada específicamente para desarrolladores de software.
 
 ## Propósito
 
-El objetivo principal de **DevsForDevs** es crear un espacio centralizado donde los desarrolladores puedan:
+El objetivo principal de **FakingDevs** es crear un espacio centralizado donde los desarrolladores puedan:
 
 - **Compartir Conocimiento:** Publicar artículos, tutoriales y fragmentos de código.
 - **Colaborar:** Encontrar compañeros para proyectos personales o de código abierto.
@@ -24,12 +24,14 @@ Este proyecto está construido con un stack moderno para asegurar una experienci
 Para levantar un entorno de desarrollo local, sigue estos pasos:
 
 1.  **Clonar el repositorio:**
+
     ```bash
     git clone https://github.com/tu-usuario/devsfordevs.git
     cd devsfordevs
     ```
 
 2.  **Instalar dependencias:**
+
     ```bash
     pnpm install
     ```

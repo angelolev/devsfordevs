@@ -178,7 +178,7 @@ const Feed: React.FC = () => {
 
         <div className="flex gap-8 justify-between">
           {/* Main Content */}
-          <div className="flex-1 max-w-full lg:max-w-fit">
+          <div className="flex-1 max-w-full">
             {user ? (
               <CreatePost onCreatePost={handleCreatePost} />
             ) : (
