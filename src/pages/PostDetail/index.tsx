@@ -129,7 +129,7 @@ const PostDetailSidebar: React.FC<{
               </div>
               <button
                 onClick={() => onUserClick(post.author)}
-                className="mt-2 w-fit text-left px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm cursor-pointer"
+                className="mt-2 w-fit text-left px-3 py-2 btn-primary text-white rounded-lg  transition-colors text-sm cursor-pointer"
               >
                 Ver perfil completo
               </button>
@@ -386,7 +386,7 @@ const PostDetail: React.FC = () => {
 
               {/* Post Info */}
               <div className="mt-4 sm:mt-0 flex-1">
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between flex-wrap gap-4">
                   <div>
                     <div className="flex items-center space-x-2 text-purple-200 mb-1">
                       <MessageCircle className="h-4 w-4" />
@@ -398,7 +398,7 @@ const PostDetail: React.FC = () => {
                     <p className="text-purple-200 text-lg mb-2">
                       @{post.author.username || post.author.email}
                     </p>
-                    <div className="flex items-center space-x-4 text-white/80">
+                    <div className="flex items-center space-x-4 text-white/80 flex-wrap gap-4">
                       <div className="flex items-center space-x-1">
                         <Calendar className="h-4 w-4" />
                         <span className="text-sm">
