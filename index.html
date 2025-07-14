@@ -71,6 +71,33 @@
     <title>
       FakingDevs - Conecta, Colabora, Comparte experiencias de programación
     </title>
+
+    <!-- Google Analytics - Replace GA_MEASUREMENT_ID with your actual measurement ID -->
+    <script>
+      (function () {
+        // This will be replaced by the actual GA ID from environment or set manually
+        var GA_MEASUREMENT_ID = "GA_MEASUREMENT_ID"; // Replace this with your GA4 Measurement ID
+
+        if (GA_MEASUREMENT_ID && GA_MEASUREMENT_ID !== "GA_MEASUREMENT_ID") {
+          // Load gtag script
+          var script = document.createElement("script");
+          script.async = true;
+          script.src =
+            "https://www.googletagmanager.com/gtag/js?id=" + GA_MEASUREMENT_ID;
+          document.head.appendChild(script);
+
+          // Initialize gtag
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag("js", new Date());
+          gtag("config", GA_MEASUREMENT_ID);
+
+          window.gtag = gtag;
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

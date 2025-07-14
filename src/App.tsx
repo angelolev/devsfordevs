@@ -7,10 +7,14 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { AuthModal, Navbar } from "./components";
 import { useState } from "react";
 import { AuthModalType } from "./types";
+import { usePageTracking } from "./hooks/usePageTracking";
 
 const AppContent: React.FC = () => {
   const [authModal, setAuthModal] = useState<AuthModalType>(null);
   const { isMissingUsername } = useAuth();
+
+  // Track page views automatically
+  usePageTracking();
 
   const handleAuthModal = (type: "login") => {
     setAuthModal(type);
