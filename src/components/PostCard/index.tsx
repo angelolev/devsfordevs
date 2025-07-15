@@ -48,7 +48,7 @@ const renderTextWithLinks = (text: string) => {
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-[#7aa2f7] hover:text-[#bb9af7] underline transition-colors duration-200"
+          className="text-[#7aa2f7] hover:text-[#bb9af7] underline transition-colors duration-200 underline-offset-4"
           onClick={(e) => e.stopPropagation()}
         >
           {part}
