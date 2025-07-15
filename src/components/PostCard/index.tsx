@@ -26,6 +26,39 @@ interface PostProps {
   hideOpenButton?: boolean;
 }
 
+// Function to detect URLs and render them as clickable links
+const renderTextWithLinks = (text: string) => {
+  // Enhanced URL regex that captures various URL formats
+  const urlRegex =
+    /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}[^\s]*)/g;
+
+  const parts = text.split(urlRegex);
+
+  return parts.map((part, index) => {
+    if (urlRegex.test(part)) {
+      // Ensure the URL has a protocol
+      let href = part;
+      if (!part.startsWith("http://") && !part.startsWith("https://")) {
+        href = `https://${part}`;
+      }
+
+      return (
+        <a
+          key={index}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#7aa2f7] hover:text-[#bb9af7] underline transition-colors duration-200"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {part}
+        </a>
+      );
+    }
+    return part;
+  });
+};
+
 const Post: React.FC<PostProps> = ({
   post,
   comments,
@@ -216,7 +249,7 @@ const Post: React.FC<PostProps> = ({
             {/* Post Text */}
             <div className="text-[#c0caf5] text-sm md:text-base whitespace-pre-wrap mb-4">
               <span className="text-[#9ece6a] mr-2">$</span>
-              {post.content}
+              {renderTextWithLinks(post.content)}
             </div>
 
             {/* Image */}
