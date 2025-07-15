@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { Filter } from "lucide-react";
 import { User } from "../../types";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { PostCard, TopicSidebar } from "../../components";
 import { useAuth } from "../../contexts/AuthContext";
 import CreatePost from "../../components/CreatePost";
@@ -279,6 +279,13 @@ const Feed: React.FC = () => {
               onTopicToggle={handleTopicFilterToggle}
               onClearAll={handleClearAllFilters}
             />
+            <Link
+              className="underline text-center block my-4 text-white/90 underline-offset-4"
+              to="https://github.com/angelolev/devsfordevs/issues"
+              target="_blank"
+            >
+              Reportar un issue
+            </Link>
           </div>
         </div>
       </div>
