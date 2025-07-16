@@ -12,6 +12,7 @@ import {
   useCreateCommentWithNotification,
   useToggleReaction,
 } from "../../lib/queries";
+import { PostSkeleton } from "./PostSkeleton";
 
 const Feed: React.FC = () => {
   const [selectedFilterTopics, setSelectedFilterTopics] = useState<string[]>(
@@ -190,13 +191,7 @@ const Feed: React.FC = () => {
               </div>
             )}
 
-            {isLoading && (
-              <div className="text-center py-12">
-                <p className="text-gray-500 dark:text-gray-400">
-                  Cargando posts...
-                </p>
-              </div>
-            )}
+            {isLoading && <PostSkeleton repeat={5} /> }
 
             {error && (
               <div className="text-center py-12">
