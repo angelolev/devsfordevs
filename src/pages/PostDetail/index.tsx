@@ -413,8 +413,12 @@ const PostDetail: React.FC = () => {
                       <div className="flex items-center space-x-1">
                         <MessageCircle className="h-4 w-4" />
                         <span className="text-sm">
-                          {comments.length} comentario
-                          {comments.length !== 1 ? "s" : ""}
+                          {comments.length}{" "}
+                          {comments.length === 0
+                            ? "comentarios"
+                            : comments.length === 1
+                            ? "comentario"
+                            : "comentarios"}
                         </span>
                       </div>
                     </div>

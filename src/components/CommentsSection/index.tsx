@@ -18,6 +18,39 @@ interface CommentItemProps {
   depth?: number;
 }
 
+// Function to detect URLs and render them as clickable links
+const renderTextWithLinks = (text: string) => {
+  // Enhanced URL regex that captures various URL formats
+  const urlRegex =
+    /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}[^\s]*)/g;
+
+  const parts = text.split(urlRegex);
+
+  return parts.map((part, index) => {
+    if (urlRegex.test(part)) {
+      // Ensure the URL has a protocol
+      let href = part;
+      if (!part.startsWith("http://") && !part.startsWith("https://")) {
+        href = `https://${part}`;
+      }
+
+      return (
+        <a
+          key={index}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline transition-colors duration-200 underline-offset-2"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {part}
+        </a>
+      );
+    }
+    return part;
+  });
+};
+
 const CommentItem: React.FC<CommentItemProps> = ({
   comment,
   postId,
@@ -102,7 +135,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
               </div>
             </div>
             <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed">
-              {comment.content}
+              {renderTextWithLinks(comment.content)}
             </p>
           </div>
 
@@ -138,18 +171,35 @@ const CommentItem: React.FC<CommentItemProps> = ({
           {showReplyForm && user && (
             <form onSubmit={handleReplySubmit} className="mt-3">
               <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={replyContent}
-                  onChange={(e) => setReplyContent(e.target.value)}
-                  placeholder={`Reply to @${comment.author.username}...`}
-                  className="input flex-1 text-sm px-3 py-2 border rounded-lg bg-white border-[#d1d5db] text-[#111827]  dark:bg-[#1a1a1a] dark:border-[#4b5563] dark:text-[#f9fafb]"
-                  maxLength={200}
-                />
+                <div className="flex-1">
+                  <textarea
+                    value={replyContent}
+                    onChange={(e) => setReplyContent(e.target.value)}
+                    placeholder={`Reply to @${comment.author.username}...`}
+                    className="input w-full text-sm px-3 py-2 border rounded-lg bg-white border-[#d1d5db] text-[#111827]  dark:bg-[#1a1a1a] dark:border-[#4b5563] dark:text-[#f9fafb] resize-none"
+                    maxLength={250}
+                    rows={2}
+                  />
+                  <div className="flex justify-end mt-1">
+                    <span
+                      className={`text-xs ${
+                        replyContent.length > 200
+                          ? "text-yellow-600 dark:text-yellow-400"
+                          : "text-gray-500 dark:text-gray-400"
+                      } ${
+                        replyContent.length === 250
+                          ? "text-red-600 dark:text-red-400"
+                          : ""
+                      }`}
+                    >
+                      {replyContent.length}/250
+                    </span>
+                  </div>
+                </div>
                 <button
                   type="submit"
                   disabled={!replyContent.trim()}
-                  className="btn-primary px-3 py-2 cursor-pointer"
+                  className="btn-primary px-3 py-2 cursor-pointer self-start"
                 >
                   <Send color="#fff" className="h-4 w-4" />
                 </button>
@@ -246,18 +296,35 @@ const CommentSection: React.FC<CommentSectionProps> = ({
             </div>
             <div className="flex-1">
               <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Añadir un comentario..."
-                  className="input flex-1 text-sm px-3 py-2 border rounded-lg bg-white border-[#d1d5db] text-[#111827]  dark:bg-[#1a1a1a] dark:border-[#4b5563] dark:text-[#f9fafb]"
-                  maxLength={200}
-                />
+                <div className="flex-1">
+                  <textarea
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Añadir un comentario..."
+                    className="input w-full text-base px-3 py-2 border rounded-lg bg-white border-[#d1d5db] text-[#111827]  dark:bg-[#1a1a1a] dark:border-[#4b5563] dark:text-[#f9fafb] resize-none"
+                    maxLength={150}
+                    rows={3}
+                  />
+                  <div className="flex justify-end mt-1">
+                    <span
+                      className={`text-xs ${
+                        newComment.length > 200
+                          ? "text-yellow-600 dark:text-yellow-400"
+                          : "text-gray-500 dark:text-gray-400"
+                      } ${
+                        newComment.length === 250
+                          ? "text-red-600 dark:text-red-400"
+                          : ""
+                      }`}
+                    >
+                      {newComment.length}/250
+                    </span>
+                  </div>
+                </div>
                 <button
                   type="submit"
                   disabled={!newComment.trim()}
-                  className="btn-primary px-3 py-2 cursor-pointer"
+                  className="btn-primary px-3 py-2 cursor-pointer self-start"
                 >
                   <Send color="#fff" className="h-4 w-4" />
                 </button>

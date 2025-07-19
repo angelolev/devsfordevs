@@ -332,7 +332,7 @@ const Post: React.FC<PostProps> = ({
               {post.commentsCount === 0
                 ? "comentarios"
                 : post.commentsCount === 1
-                ? "comentarios"
+                ? "comentario"
                 : "comentarios"}
             </span>
           </span>
